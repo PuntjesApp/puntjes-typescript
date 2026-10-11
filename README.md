@@ -37,7 +37,7 @@ the types of every request and answer. Each call takes `path`, `query` and `body
 `{ data, request, response }`. The API wraps each answer in its own `data` field, so the record is `data.data`.
 
 `examples/quick-start.ts` is a complete script:
-`npm run build && node examples/quick-start.ts <card or email> [amount in cents]`, with `PUNTJES_CLIENT_ID`,
+`npm run build && node examples/quick-start.ts <card number> [amount in cents]`, with `PUNTJES_CLIENT_ID`,
 `PUNTJES_CLIENT_SECRET` and, for a local app, `PUNTJES_BASE_URL` set.
 
 ## Options

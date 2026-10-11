@@ -2,7 +2,7 @@ import { createPuntjes, idempotencyKey, PuntjesError } from '@puntjes/sdk';
 
 const [card, amount = '4200'] = process.argv.slice(2);
 if (!card) {
-  console.error('Usage: npm run build && node examples/quick-start.ts <customer email or card number> [amount in cents]');
+  console.error('Usage: npm run build && node examples/quick-start.ts <card number> [amount in cents]');
   process.exit(1);
 }
 
