@@ -72,6 +72,15 @@ jobs:
             echo "::error::npm $version cannot publish with trusted publishing; it needs 11.5.1 or later."
             exit 1
           fi
+      - name: Check that the tag and package.json name the same version
+        env:
+          TAG: ${{ needs.release-please.outputs.tag }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::The tag is $TAG but package.json says $version. release-please did not move the version."
+            exit 1
+          fi
       - run: npm ci
       - run: npm run build
       - name: Skip a version npm already has
