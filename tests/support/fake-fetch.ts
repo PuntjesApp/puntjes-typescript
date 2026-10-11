@@ -29,6 +29,8 @@ export class FakeFetch {
     json(200, { token_type: 'Bearer', expires_in: 3600, access_token: `token-${n}` });
   respond: Answer | null = null;
   latency = 0;
+  apiLatency: ((call: number) => number) | null = null;
+  private apiCalls = 0;
   private readonly answers: Answer[] = [];
 
   readonly fetch = async (request: Request): Promise<Response> => {
@@ -41,6 +43,11 @@ export class FakeFetch {
       this.grantBodies.push(body);
       this.grants += 1;
       return this.grantAnswer(this.grants);
+    }
+
+    this.apiCalls += 1;
+    if (this.apiLatency) {
+      await wait(this.apiLatency(this.apiCalls), request.signal);
     }
 
     this.requests.push({

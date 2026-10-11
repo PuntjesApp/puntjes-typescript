@@ -1,4 +1,4 @@
-import { TransportError } from '../errors.ts';
+import { PuntjesError, TransportError } from '../errors.ts';
 import { RATE_LIMITED, readErrorBody, retryAfter } from './error-body.ts';
 import type { Fetch } from './fetch.ts';
 
@@ -33,6 +33,10 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
       } catch (error) {
         if (request.signal.aborted) {
           throw request.signal.reason;
+        }
+
+        if (error instanceof PuntjesError) {
+          throw error;
         }
 
         if (attempt < retries) {

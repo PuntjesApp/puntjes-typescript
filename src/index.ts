@@ -1,3 +1,4 @@
+export { InMemoryTokenStore, type AccessToken, type TokenStore } from './auth/token-store.ts';
 export { createPuntjes, DEFAULT_BASE_URL, type PuntjesOptions } from './create-puntjes.ts';
 export {
   AuthenticationError,

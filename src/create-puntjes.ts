@@ -1,5 +1,8 @@
+import { TokenSource, tokenKey } from './auth/token-source.ts';
+import { InMemoryTokenStore, type TokenStore } from './auth/token-store.ts';
 import { createClient, createConfig } from './generated/client/index.ts';
 import { PuntjesApi } from './generated/sdk.gen.ts';
+import { authFetch } from './http/auth-fetch.ts';
 import { errorFetch } from './http/error-fetch.ts';
 import { asGlobalFetch, type Fetch } from './http/fetch.ts';
 import { retryFetch } from './http/retry-fetch.ts';
@@ -7,6 +10,10 @@ import { retryFetch } from './http/retry-fetch.ts';
 export const DEFAULT_BASE_URL = 'https://puntjes.app';
 
 const API_PREFIX = '/api/v1';
+
+const TOKEN_PATH = '/oauth/token';
+
+const UNSIGNED_TOKEN = 'pending';
 
 export interface PuntjesOptions {
   clientId: string;
@@ -21,6 +28,8 @@ export interface PuntjesOptions {
   retryBaseDelay?: number;
   /** How long one attempt may take, in milliseconds. 30000 by default. */
   timeout?: number;
+  /** Where tokens are kept between calls. In this process by default. */
+  tokenStore?: TokenStore;
   /** How to wait between retries, for a test. */
   sleep?: (ms: number, signal: AbortSignal) => Promise<void>;
 }
@@ -39,10 +48,20 @@ export function createPuntjes(options: PuntjesOptions): PuntjesApi {
     timeout: options.timeout ?? 30_000,
     sleep: options.sleep ?? sleep,
   };
+  const grants = retryFetch(transport, { ...retry, repeatEveryMethod: true });
+  const tokens = new TokenSource(
+    options.clientId,
+    options.clientSecret,
+    host + TOKEN_PATH,
+    tokenKey(host, options.clientId, options.clientSecret),
+    options.tokenStore ?? new InMemoryTokenStore(),
+    grants,
+  );
   const client = createClient(
     createConfig({
       baseUrl: host + API_PREFIX,
-      fetch: asGlobalFetch(errorFetch(retryFetch(transport, retry))),
+      auth: () => UNSIGNED_TOKEN,
+      fetch: asGlobalFetch(errorFetch(retryFetch(authFetch(transport, tokens), retry))),
       throwOnError: true,
     }),
   );
