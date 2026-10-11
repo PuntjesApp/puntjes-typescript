@@ -1,0 +1,40 @@
+{
+  "name": "@puntjes/sdk",
+  "version": "1.0.0",
+  "description": "The official TypeScript client for the Puntjes loyalty API.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PuntjesApp/puntjes-typescript.git"
+  },
+  "homepage": "https://puntjes.app/docs/sdks",
+  "bugs": "https://github.com/PuntjesApp/puntjes-typescript/issues",
+  "keywords": ["puntjes", "loyalty", "api", "sdk"],
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "generate": "openapi-ts && node tools/codegen.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src tools tests examples --ignore-pattern 'src/generated/**'",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0",
+    "@types/node": "22.20.5",
+    "oxlint": "1.87.0",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}
