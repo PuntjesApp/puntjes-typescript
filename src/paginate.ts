@@ -1,4 +1,4 @@
-import type { PaginationMeta } from './generated/types.gen.ts';
+import type { PaginationMeta } from './generated/types.gen.js';
 
 export interface Page<T> {
   data: T[];

@@ -1,11 +1,11 @@
-import { TokenSource, tokenKey } from './auth/token-source.ts';
-import { InMemoryTokenStore, type TokenStore } from './auth/token-store.ts';
-import { createClient, createConfig } from './generated/client/index.ts';
-import { PuntjesApi } from './generated/sdk.gen.ts';
-import { authFetch } from './http/auth-fetch.ts';
-import { errorFetch } from './http/error-fetch.ts';
-import { asGlobalFetch, type Fetch } from './http/fetch.ts';
-import { retryFetch } from './http/retry-fetch.ts';
+import { TokenSource, tokenKey } from './auth/token-source.js';
+import { InMemoryTokenStore, type TokenStore } from './auth/token-store.js';
+import { createClient, createConfig } from './generated/client/index.js';
+import { PuntjesApi } from './generated/sdk.gen.js';
+import { authFetch } from './http/auth-fetch.js';
+import { errorFetch } from './http/error-fetch.js';
+import { asGlobalFetch, type Fetch } from './http/fetch.js';
+import { retryFetch } from './http/retry-fetch.js';
 
 export const DEFAULT_BASE_URL = 'https://puntjes.app';
 

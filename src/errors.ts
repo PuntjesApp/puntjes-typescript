@@ -1,4 +1,4 @@
-import { type ErrorCode, isErrorCode } from './generated/error-codes.gen.ts';
+import { type ErrorCode, isErrorCode } from './generated/error-codes.gen.js';
 
 export interface PuntjesErrorInit {
   status?: number | null;

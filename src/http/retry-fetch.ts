@@ -1,6 +1,6 @@
-import { PuntjesError, TransportError } from '../errors.ts';
-import { RATE_LIMITED, readErrorBody, retryAfter } from './error-body.ts';
-import type { Fetch } from './fetch.ts';
+import { PuntjesError, TransportError } from '../errors.js';
+import { RATE_LIMITED, readErrorBody, retryAfter } from './error-body.js';
+import type { Fetch } from './fetch.js';
 
 export interface RetryOptions {
   maxRetries: number;

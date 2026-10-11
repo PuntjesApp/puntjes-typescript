@@ -9,7 +9,7 @@ import {
   ServerError,
   TransportError,
   ValidationError,
-} from '../errors.ts';
+} from '../errors.js';
 
 export const RATE_LIMITED = 'RATE_LIMITED';
 export const PLAN_LIMIT_EXCEEDED = 'PLAN_LIMIT_EXCEEDED';

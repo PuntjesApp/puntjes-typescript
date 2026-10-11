@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
-import { AuthenticationError, PuntjesError, TransportError } from '../errors.ts';
-import { toError } from '../http/error-body.ts';
-import type { Fetch } from '../http/fetch.ts';
-import type { AccessToken, TokenStore } from './token-store.ts';
+import { AuthenticationError, PuntjesError, TransportError } from '../errors.js';
+import { toError } from '../http/error-body.js';
+import type { Fetch } from '../http/fetch.js';
+import type { AccessToken, TokenStore } from './token-store.js';
 
 const LEEWAY = 30_000;
 

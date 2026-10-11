@@ -1,5 +1,5 @@
-import type { TokenSource } from '../auth/token-source.ts';
-import type { Fetch } from './fetch.ts';
+import type { TokenSource } from '../auth/token-source.js';
+import type { Fetch } from './fetch.js';
 
 /**
  * The innermost layer. The generated client marks each operation that needs a token with a placeholder header; this

@@ -1,6 +1,6 @@
-import { PuntjesError, TransportError } from '../errors.ts';
-import { toError } from './error-body.ts';
-import type { Fetch } from './fetch.ts';
+import { PuntjesError, TransportError } from '../errors.js';
+import { toError } from './error-body.js';
+import type { Fetch } from './fetch.js';
 
 /** The outermost layer: a non-2xx response becomes its family error, a failed fetch a `TransportError`. */
 export function errorFetch(next: Fetch): Fetch {

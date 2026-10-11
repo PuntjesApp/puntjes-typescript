@@ -1,4 +1,4 @@
-import type { PuntjesApi } from './generated/sdk.gen.ts';
+import type { PuntjesApi } from './generated/sdk.gen.js';
 
 /** Downloads a customer's wallet pass file. The generated client knows only the JSON answer of this call. */
 export const walletPass = {
