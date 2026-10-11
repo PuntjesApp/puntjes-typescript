@@ -12,6 +12,9 @@ export {
   TransportError,
   ValidationError,
 } from './errors.ts';
+export { idempotencyKey } from './idempotency-key.ts';
+export { paginate, type Page } from './paginate.ts';
+export { walletPass } from './wallet-pass.ts';
 export { ErrorCode, errorCodeStatus, isErrorCode } from './generated/error-codes.gen.ts';
 export { PuntjesApi } from './generated/sdk.gen.ts';
 export type * from './generated/types.gen.ts';
