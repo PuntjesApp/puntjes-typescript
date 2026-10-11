@@ -172,4 +172,48 @@ describe('authentication', () => {
 
     expect(fake.requests.map((r) => r.authorization)).toEqual(['Bearer token-1', 'Bearer rotated']);
   });
+
+  it('resends the same body after a 401 on a POST', async () => {
+    const fake = new FakeFetch().answerError(401, 'UNAUTHENTICATED').answerJson(201, ok);
+
+    await fake.client().submitTransaction({ body: { identifier: 'c1', total_amount: 100, idempotency_key: 'key-1' } });
+
+    expect(fake.requests.map((r) => r.authorization)).toEqual(['Bearer token-1', 'Bearer token-2']);
+    expect(fake.requests[1]?.body).toBe(fake.requests[0]?.body);
+    expect(fake.requests[1]?.body).toContain('"idempotency_key":"key-1"');
+  });
+
+  it('keys a token on the host and both credentials, as the .NET SDK does', () => {
+    expect(storeKey()).toBe('puntjes:token:601d813db6713f8cb12787586dc64e01');
+    expect(tokenKey('https://other.test', 'client-id', 'client-secret')).not.toBe(storeKey());
+    expect(tokenKey('https://shop.test', 'client-id', 'other-secret')).not.toBe(storeKey());
+  });
+
+  it('throws an AuthenticationError when the token endpoint answers 400', async () => {
+    const fake = new FakeFetch();
+    fake.grantAnswer = () => json(400, { error: 'invalid_client', error_description: 'Client authentication failed' });
+
+    const error = await fake.client().showMe().catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(AuthenticationError);
+    expect((error as AuthenticationError).rawCode).toBe('invalid_client');
+  });
+
+  it('hands a failing token store to the caller as it is, without retrying', async () => {
+    const failure = new Error('redis down');
+    const waits: number[] = [];
+    const tokenStore: TokenStore = {
+      get: async () => {
+        throw failure;
+      },
+      set: async () => {},
+      delete: async () => {},
+    };
+    const fake = new FakeFetch();
+
+    const error = await fake.client({ tokenStore, sleep: async (ms) => void waits.push(ms) }).showMe().catch((e: unknown) => e);
+
+    expect(error).toBe(failure);
+    expect(waits).toEqual([]);
+  });
 });

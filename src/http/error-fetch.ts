@@ -1,15 +1,16 @@
-import { PuntjesError, TransportError } from '../errors.js';
+import { TransportError } from '../errors.js';
+import { isNetworkFailure } from './retry-fetch.js';
 import { toError } from './error-body.js';
 import type { Fetch } from './fetch.js';
 
-/** The outermost layer: a non-2xx response becomes its family error, a failed fetch a `TransportError`. */
+/** The outermost layer: a non-2xx response becomes its family error, a failed connection a `TransportError`. */
 export function errorFetch(next: Fetch): Fetch {
   return async (request) => {
     let response: Response;
     try {
       response = await next(request);
     } catch (error) {
-      if (error instanceof PuntjesError || request.signal.aborted) {
+      if (!isNetworkFailure(error) || request.signal.aborted) {
         throw error;
       }
 

@@ -10,7 +10,7 @@ export interface PuntjesErrorInit {
 
 /**
  * A call the Puntjes API refused, or one that got no usable answer. `code` is null for a code this version does not
- * know yet; `rawCode` always holds the code as the API sent it.
+ * know yet; `rawCode` holds the code the API sent, `UNKNOWN_ERROR` or `NON_JSON_RESPONSE` when it sent none.
  */
 export class PuntjesError extends Error {
   readonly status: number | null;
@@ -53,7 +53,7 @@ export class ValidationError extends PuntjesError {
   }
 }
 
-/** HTTP 429 with RATE_LIMITED: wait `retryAfter` milliseconds and try again. */
+/** HTTP 429 other than PLAN_LIMIT_EXCEEDED: wait `retryAfter` milliseconds. Only RATE_LIMITED is retried for you. */
 export class RateLimitError extends PuntjesError {
   readonly retryAfter: number | null;
 

@@ -1,4 +1,4 @@
-import { PuntjesError, TransportError } from '../errors.js';
+import { TransportError } from '../errors.js';
 import { RATE_LIMITED, readErrorBody, retryAfter } from './error-body.js';
 import type { Fetch } from './fetch.js';
 
@@ -35,7 +35,7 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
           throw request.signal.reason;
         }
 
-        if (error instanceof PuntjesError) {
+        if (!timeout.aborted && !isNetworkFailure(error)) {
           throw error;
         }
 
@@ -58,6 +58,11 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
       await options.sleep(retryAfter(response.headers.get('Retry-After'), Date.now()) ?? delay(options, attempt), request.signal);
     }
   };
+}
+
+/** fetch rejects with a TypeError when the connection fails or the body breaks while it is read. */
+export function isNetworkFailure(error: unknown): boolean {
+  return error instanceof TypeError;
 }
 
 function isSafeToRepeat(method: string, body: ArrayBuffer | null): boolean {
