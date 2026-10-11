@@ -80,6 +80,7 @@ export function isNetworkFailure(error: unknown): boolean {
 }
 
 function withBody(request: Request, body: ArrayBuffer | null): Request {
+  // oxlint-disable-next-line unicorn/no-invalid-fetch-options -- a GET has a null body and takes the first branch
   return body === null ? new Request(request) : new Request(request, { body });
 }
 
