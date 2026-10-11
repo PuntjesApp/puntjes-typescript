@@ -1,0 +1,105 @@
+name: Release
+
+# release-please keeps a release PR open from the conventional commits on main. That PR merges itself when CI is
+# green; the merge tags the version, and the publish job publishes the package to npm with trusted publishing.
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release PR and tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      released: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app
+        with:
+          client-id: ${{ vars.SDK_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.SDK_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          token: ${{ steps.app.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - name: Let the release PR merge itself when CI is green
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          PR_JSON: ${{ steps.release.outputs.pr }}
+        run: |
+          number=$(printf '%s' "$PR_JSON" | jq -r '.number // empty' 2>/dev/null || true)
+          if [ -z "$number" ]; then
+            echo "release-please opened or updated no release PR in this run."
+            exit 0
+          fi
+          gh pr merge "$number" --repo "$GITHUB_REPOSITORY" --auto --squash
+
+  # Its own job, so "Re-run failed jobs" publishes again: release-please reports a release only once.
+  publish:
+    name: Publish to npm
+    needs: release-please
+    if: needs.release-please.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write # trusted publishing: npm trades the OIDC token for a one-time credential and adds provenance
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.release-please.outputs.tag }}
+          persist-credentials: false
+      # No registry-url: it writes an .npmrc that expects NODE_AUTH_TOKEN, which breaks the OIDC exchange.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Check that npm can publish with trusted publishing
+        run: |
+          version=$(npm --version)
+          if [ "$(printf '%s\n' 11.5.1 "$version" | sort -V | head -n1)" != 11.5.1 ]; then
+            echo "::error::npm $version cannot publish with trusted publishing; it needs 11.5.1 or later."
+            exit 1
+          fi
+      - name: Check that the tag and package.json name the same version
+        env:
+          TAG: ${{ needs.release-please.outputs.tag }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::The tag is $TAG but package.json says $version. release-please did not move the version."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run build
+      - name: Skip a version npm already has
+        id: published
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          if npm view "$name@$version" version > /dev/null 2>&1; then
+            echo "::notice::$name@$version is already on npm, so there is nothing to publish."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Publish
+        id: publish
+        if: steps.published.outputs.exists == 'false'
+        run: npm publish --access public
+      - name: Say what npm needs
+        if: failure() && steps.publish.outcome == 'failure'
+        run: |
+          echo "::error::npm refused the publish. The first version is published by hand, then the package needs a trusted publisher for PuntjesApp/puntjes-typescript, workflow release.yml (README, Releases). Then re-run this job."
+          exit 1

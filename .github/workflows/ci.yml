@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Types, lint and tests on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+  # vitest needs Node 22, so Node 20 is proven by the packed package alone.
+  package:
+    name: The packed package on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack
+      # Unpacked by hand rather than installed: the package has no dependencies, and this proves it.
+      - name: Unpack, type-check and run it in a Node project with no DOM types
+        working-directory: tests/consumer
+        run: |
+          mkdir -p node_modules/@puntjes/sdk
+          tar -xzf ../../puntjes-sdk-*.tgz -C node_modules/@puntjes/sdk --strip-components=1
+          ../../node_modules/.bin/tsc -p .
+          node dist/index.js
+
+  # A hand edit under src/generated, or a generator bump with no regeneration, turns this red.
+  generated:
+    name: Generated code matches the spec
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Regenerate from spec/api.json
+        run: npm run generate
+      - name: Fail on any difference
+        run: |
+          git status --porcelain -- src/generated
+          test -z "$(git status --porcelain -- src/generated)"
+
+  workflows:
+    name: Workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+      - name: zizmor
+        run: pipx run zizmor==1.30.1 --offline .github/workflows
+
+  # The one check the main ruleset requires, so a change to the jobs above never edits the ruleset.
+  ci:
+    name: CI
+    needs: [test, package, generated, workflows]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Every job passed
+        env:
+          TEST: ${{ needs.test.result }}
+          PACKAGE: ${{ needs.package.result }}
+          GENERATED: ${{ needs.generated.result }}
+          WORKFLOWS: ${{ needs.workflows.result }}
+        run: test "$TEST" = success && test "$PACKAGE" = success && test "$GENERATED" = success && test "$WORKFLOWS" = success
