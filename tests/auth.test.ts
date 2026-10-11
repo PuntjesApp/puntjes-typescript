@@ -8,7 +8,7 @@ const storeKey = () => tokenKey('https://shop.test', 'client-id', 'client-secret
 
 describe('authentication', () => {
   it('shares one grant between two calls', async () => {
-    const fake = new FakeFetch().thenJson(200, ok).thenJson(200, ok);
+    const fake = new FakeFetch().answerJson(200, ok).answerJson(200, ok);
     const puntjes = fake.client();
 
     await puntjes.showMe();
@@ -20,7 +20,7 @@ describe('authentication', () => {
   });
 
   it('grants again after a rejected token and sends the call once more', async () => {
-    const fake = new FakeFetch().thenError(401, 'UNAUTHENTICATED').thenJson(200, ok);
+    const fake = new FakeFetch().answerError(401, 'UNAUTHENTICATED').answerJson(200, ok);
 
     await fake.client().showMe();
 
@@ -29,7 +29,7 @@ describe('authentication', () => {
   });
 
   it('hands a second rejection to the caller', async () => {
-    const fake = new FakeFetch().thenError(401, 'UNAUTHENTICATED', 2).thenJson(200, ok);
+    const fake = new FakeFetch().answerError(401, 'UNAUTHENTICATED', 2).answerJson(200, ok);
 
     await expect(fake.client().showMe()).rejects.toBeInstanceOf(AuthenticationError);
 
@@ -37,7 +37,7 @@ describe('authentication', () => {
   });
 
   it('sends no token on a public operation', async () => {
-    const fake = new FakeFetch().thenJson(200, { status: 'ok' });
+    const fake = new FakeFetch().answerJson(200, { status: 'ok' });
 
     await fake.client().checkHealth();
 
@@ -48,7 +48,7 @@ describe('authentication', () => {
   it('shares one grant between parallel calls on a cold client', async () => {
     const fake = new FakeFetch();
     fake.latency = 20;
-    for (let i = 0; i < 20; i++) fake.thenJson(200, ok);
+    for (let i = 0; i < 20; i++) fake.answerJson(200, ok);
     const puntjes = fake.client();
 
     await Promise.all(Array.from({ length: 20 }, () => puntjes.showMe()));
@@ -59,7 +59,7 @@ describe('authentication', () => {
   it('uses a stored token until shortly before it expires', async () => {
     const tokenStore = new InMemoryTokenStore();
     await tokenStore.set(storeKey(), { value: 'stored', expiresAt: Date.now() + 10 * 60_000 });
-    const fake = new FakeFetch().thenJson(200, ok);
+    const fake = new FakeFetch().answerJson(200, ok);
 
     await fake.client({ tokenStore }).showMe();
 
@@ -70,7 +70,7 @@ describe('authentication', () => {
   it('replaces a token about to expire', async () => {
     const tokenStore = new InMemoryTokenStore();
     await tokenStore.set(storeKey(), { value: 'stale', expiresAt: Date.now() + 10_000 });
-    const fake = new FakeFetch().thenJson(200, ok);
+    const fake = new FakeFetch().answerJson(200, ok);
 
     await fake.client({ tokenStore }).showMe();
 
@@ -99,7 +99,7 @@ describe('authentication', () => {
 
   it('keeps one token per shop in a shared store', async () => {
     const tokenStore = new InMemoryTokenStore();
-    const fake = new FakeFetch().thenJson(200, ok).thenJson(200, ok);
+    const fake = new FakeFetch().answerJson(200, ok).answerJson(200, ok);
 
     await fake.client({ tokenStore, clientId: 'shop-a' }).showMe();
     await fake.client({ tokenStore, clientId: 'shop-b' }).showMe();
@@ -109,7 +109,7 @@ describe('authentication', () => {
   });
 
   it('replaces a short-lived token when its own lifetime ends', async () => {
-    const fake = new FakeFetch().thenJson(200, ok).thenJson(200, ok);
+    const fake = new FakeFetch().answerJson(200, ok).answerJson(200, ok);
     fake.grantAnswer = (n) => json(200, { token_type: 'Bearer', expires_in: 10, access_token: `token-${n}` });
     const puntjes = fake.client();
 
@@ -120,7 +120,7 @@ describe('authentication', () => {
   });
 
   it('retries a token endpoint hiccup', async () => {
-    const fake = new FakeFetch().thenJson(200, ok);
+    const fake = new FakeFetch().answerJson(200, ok);
     fake.grantAnswer = (n) =>
       n === 1 ? errorResponse(503, 'INTERNAL_ERROR') : json(200, { token_type: 'Bearer', expires_in: 3600, access_token: 'token-ok' });
 
@@ -159,7 +159,7 @@ describe('authentication', () => {
   });
 
   it('sends the current token on a retried attempt', async () => {
-    const fake = new FakeFetch().thenError(503, 'INTERNAL_ERROR').thenJson(200, ok);
+    const fake = new FakeFetch().answerError(503, 'INTERNAL_ERROR').answerJson(200, ok);
     const tokenStore = new InMemoryTokenStore();
     const puntjes = fake.client({
       tokenStore,

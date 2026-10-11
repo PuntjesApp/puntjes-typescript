@@ -32,7 +32,7 @@ describe('errors', () => {
     [429, 'PLAN_LIMIT_EXCEEDED', PlanLimitExceededError, ErrorCode.PlanLimitExceeded],
     [500, 'INTERNAL_ERROR', ServerError, ErrorCode.InternalError],
   ])('a %i with %s throws its family', async (status, code, family, expected) => {
-    const fake = new FakeFetch().thenError(status, code, 3);
+    const fake = new FakeFetch().answerError(status, code, 3);
 
     const error = await caught(fake.client().showMe());
 
@@ -46,7 +46,7 @@ describe('errors', () => {
   });
 
   it('hands the validation details to the caller', async () => {
-    const fake = new FakeFetch().thenError(422, 'VALIDATION_ERROR');
+    const fake = new FakeFetch().answerError(422, 'VALIDATION_ERROR');
 
     const error = (await caught(fake.client().showMe())) as ValidationError;
 
@@ -57,7 +57,7 @@ describe('errors', () => {
   });
 
   it('keeps the raw code of a code this version does not know', async () => {
-    const fake = new FakeFetch().thenError(404, 'SOMETHING_NEW');
+    const fake = new FakeFetch().answerError(404, 'SOMETHING_NEW');
 
     const error = await caught(fake.client().showMe());
 
@@ -67,7 +67,7 @@ describe('errors', () => {
   });
 
   it('throws the base error for a status no family covers', async () => {
-    const fake = new FakeFetch().thenError(410, 'GONE_FOREVER');
+    const fake = new FakeFetch().answerError(410, 'GONE_FOREVER');
 
     const error = await caught(fake.client().showMe());
 
@@ -78,7 +78,7 @@ describe('errors', () => {
   it('makes a non-JSON server error a ServerError', async () => {
     const fake = new FakeFetch();
     for (let i = 0; i < 3; i++) {
-      fake.then(() => new Response('<html>bad gateway</html>', { status: 502 }));
+      fake.answer(() => new Response('<html>bad gateway</html>', { status: 502 }));
     }
 
     const error = await caught(fake.client().showMe());
@@ -90,7 +90,7 @@ describe('errors', () => {
   });
 
   it('makes a non-JSON client error a TransportError', async () => {
-    const fake = new FakeFetch().then(() => new Response('<html>login</html>', { status: 404 }));
+    const fake = new FakeFetch().answer(() => new Response('<html>login</html>', { status: 404 }));
 
     const error = await caught(fake.client().showMe());
 
@@ -98,7 +98,7 @@ describe('errors', () => {
   });
 
   it('falls back to the status for JSON with no error object', async () => {
-    const fake = new FakeFetch().thenJson(409, { message: 'no envelope' });
+    const fake = new FakeFetch().answerJson(409, { message: 'no envelope' });
 
     const error = await caught(fake.client().showMe());
 
@@ -110,7 +110,7 @@ describe('errors', () => {
 
   it('makes a network failure a TransportError with the cause', async () => {
     const failure = new TypeError('fetch failed');
-    const fake = new FakeFetch().thenThrow(failure, 3);
+    const fake = new FakeFetch().answerThrow(failure, 3);
 
     const error = await caught(fake.client().showMe());
 
@@ -121,7 +121,7 @@ describe('errors', () => {
   it.each(['https://shop.test', 'https://shop.test/', 'https://shop.test/api/v1', 'https://shop.test/api/v1/'])(
     'reaches the same URL from the base URL %s',
     async (baseUrl) => {
-      const fake = new FakeFetch().thenJson(200, { data: {} });
+      const fake = new FakeFetch().answerJson(200, { data: {} });
 
       await fake.client({ baseUrl }).showMe();
 
@@ -130,7 +130,7 @@ describe('errors', () => {
   );
 
   it('takes the request id from the response header when the body has none', async () => {
-    const fake = new FakeFetch().then(() =>
+    const fake = new FakeFetch().answer(() =>
       json(404, { error: { code: 'CUSTOMER_NOT_FOUND', message: 'No such customer.', status: 404 } }, { 'X-Request-ID': 'req-header' }),
     );
 
@@ -142,7 +142,7 @@ describe('errors', () => {
   it('tells how long a rate limit asks to wait', async () => {
     const fake = new FakeFetch();
     for (let i = 0; i < 3; i++) {
-      fake.then(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': '7' }));
+      fake.answer(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': '7' }));
     }
 
     const error = (await caught(fake.client().showMe())) as RateLimitError;

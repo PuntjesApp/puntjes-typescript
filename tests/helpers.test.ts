@@ -26,28 +26,28 @@ describe('helpers', () => {
   });
 
   it('yields every item of every page in order', async () => {
-    const fake = new FakeFetch().thenJson(200, { data: page(1, 3, 'a', 'b') }).thenJson(200, { data: page(2, 3, 'c') }).thenJson(200, { data: page(3, 3, 'd') });
+    const fake = new FakeFetch().answerJson(200, { data: page(1, 3, 'a', 'b') }).answerJson(200, { data: page(2, 3, 'c') }).answerJson(200, { data: page(3, 3, 'd') });
 
     expect(await collect(fake)).toEqual(['a', 'b', 'c', 'd']);
     expect(fake.requests.map((r) => new URL(r.url).search)).toEqual(['?page=1', '?page=2', '?page=3']);
   });
 
   it('stops when the server ignores the page', async () => {
-    const fake = new FakeFetch().thenJson(200, { data: page(1, 5, 'a') }).thenJson(200, { data: page(1, 5, 'a') });
+    const fake = new FakeFetch().answerJson(200, { data: page(1, 5, 'a') }).answerJson(200, { data: page(1, 5, 'a') });
 
     expect(await collect(fake)).toEqual(['a']);
     expect(fake.requests).toHaveLength(2);
   });
 
   it('yields nothing for an empty first page', async () => {
-    const fake = new FakeFetch().thenJson(200, { data: page(1, 1) });
+    const fake = new FakeFetch().answerJson(200, { data: page(1, 1) });
 
     expect(await collect(fake)).toEqual([]);
   });
 
   it('fetches the Apple pass as bytes', async () => {
     const bytes = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
-    const fake = new FakeFetch().then(() => new Response(bytes, { status: 200, headers: { 'Content-Type': 'application/vnd.apple.pkpass' } }));
+    const fake = new FakeFetch().answer(() => new Response(bytes, { status: 200, headers: { 'Content-Type': 'application/vnd.apple.pkpass' } }));
 
     const pass = await walletPass.apple(fake.client(), 'cus_1');
 
@@ -58,7 +58,7 @@ describe('helpers', () => {
   });
 
   it('has no pass for a missing customer', async () => {
-    const fake = new FakeFetch().then(() => json(404, { error: { code: 'CUSTOMER_NOT_FOUND', message: 'No.', status: 404, request_id: 'r' } }));
+    const fake = new FakeFetch().answer(() => json(404, { error: { code: 'CUSTOMER_NOT_FOUND', message: 'No.', status: 404, request_id: 'r' } }));
 
     await expect(walletPass.apple(fake.client(), 'cus_404')).rejects.toBeInstanceOf(NotFoundError);
   });

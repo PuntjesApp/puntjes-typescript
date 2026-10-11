@@ -27,7 +27,7 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
       const signal = AbortSignal.any([request.signal, timeout]);
       let response: Response;
       try {
-        const sent = await next(new Request(request, { body, signal }));
+        const sent = await next(new Request(request, body === null ? { signal } : { body, signal }));
         const buffered = await sent.arrayBuffer();
         response = new Response(buffered.byteLength === 0 ? null : buffered, sent);
       } catch (error) {

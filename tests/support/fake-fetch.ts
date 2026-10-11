@@ -67,33 +67,33 @@ export class FakeFetch {
     return answer(request);
   };
 
-  then(answer: Answer): this {
+  answer(answer: Answer): this {
     this.answers.push(answer);
     return this;
   }
 
-  thenJson(status: number, body: unknown, headers: Record<string, string> = {}): this {
-    return this.then(() => json(status, body, headers));
+  answerJson(status: number, body: unknown, headers: Record<string, string> = {}): this {
+    return this.answer(() => json(status, body, headers));
   }
 
-  thenError(status: number, code: string, times = 1, headers: Record<string, string> = {}): this {
+  answerError(status: number, code: string, times = 1, headers: Record<string, string> = {}): this {
     for (let i = 0; i < times; i++) {
-      this.then(() => errorResponse(status, code, 'req-1', headers));
+      this.answer(() => errorResponse(status, code, 'req-1', headers));
     }
     return this;
   }
 
-  thenThrow(error: unknown, times = 1): this {
+  answerThrow(error: unknown, times = 1): this {
     for (let i = 0; i < times; i++) {
-      this.then(() => {
+      this.answer(() => {
         throw error;
       });
     }
     return this;
   }
 
-  thenHang(): this {
-    return this.then((request) => wait(Number.POSITIVE_INFINITY, request.signal).then(() => json(200, {})));
+  answerHang(): this {
+    return this.answer((request) => wait(Number.POSITIVE_INFINITY, request.signal).then(() => json(200, {})));
   }
 
   client(options: Partial<PuntjesOptions> = {}) {

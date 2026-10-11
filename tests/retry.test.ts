@@ -22,7 +22,7 @@ const record = (puntjes: ReturnType<FakeFetch['client']>, idempotencyKey: string
 describe('retry', () => {
   it('retries a GET after a server error, after the first wait', async () => {
     const { fake, waits, client } = setup();
-    fake.thenError(503, 'INTERNAL_ERROR').thenJson(200, ok);
+    fake.answerError(503, 'INTERNAL_ERROR').answerJson(200, ok);
 
     await client().showMe();
 
@@ -32,7 +32,7 @@ describe('retry', () => {
 
   it('doubles the wait and holds the limit', async () => {
     const { fake, waits, client } = setup();
-    fake.thenError(500, 'INTERNAL_ERROR', 3);
+    fake.answerError(500, 'INTERNAL_ERROR', 3);
 
     await expect(client().showMe()).rejects.toBeInstanceOf(ServerError);
 
@@ -42,7 +42,7 @@ describe('retry', () => {
 
   it('retries a POST that carries an idempotency key, with the same body', async () => {
     const { fake, client } = setup();
-    fake.thenError(503, 'INTERNAL_ERROR').thenJson(201, ok);
+    fake.answerError(503, 'INTERNAL_ERROR').answerJson(201, ok);
 
     await record(client(), 'key-1');
 
@@ -53,7 +53,7 @@ describe('retry', () => {
 
   it('sends a POST without an idempotency key once', async () => {
     const { fake, client } = setup();
-    fake.thenError(503, 'INTERNAL_ERROR').thenJson(201, ok);
+    fake.answerError(503, 'INTERNAL_ERROR').answerJson(201, ok);
 
     await expect(record(client(), null)).rejects.toBeInstanceOf(ServerError);
 
@@ -62,7 +62,7 @@ describe('retry', () => {
 
   it('sends a POST without an idempotency key once on a network failure', async () => {
     const { fake, client } = setup();
-    fake.thenThrow(new TypeError('fetch failed')).thenJson(201, ok);
+    fake.answerThrow(new TypeError('fetch failed')).answerJson(201, ok);
 
     await expect(record(client(), null)).rejects.toBeInstanceOf(TransportError);
 
@@ -71,7 +71,7 @@ describe('retry', () => {
 
   it('sends a POST with an empty idempotency key once', async () => {
     const { fake, client } = setup();
-    fake.thenError(503, 'INTERNAL_ERROR').thenJson(201, ok);
+    fake.answerError(503, 'INTERNAL_ERROR').answerJson(201, ok);
 
     await expect(record(client(), '')).rejects.toBeInstanceOf(ServerError);
 
@@ -80,7 +80,7 @@ describe('retry', () => {
 
   it('retries a GET after a network failure', async () => {
     const { fake, client } = setup();
-    fake.thenThrow(new TypeError('fetch failed')).thenJson(200, ok);
+    fake.answerThrow(new TypeError('fetch failed')).answerJson(200, ok);
 
     await client().showMe();
 
@@ -89,7 +89,7 @@ describe('retry', () => {
 
   it('waits what Retry-After says on a rate limit', async () => {
     const { fake, waits, client } = setup();
-    fake.then(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': '3' })).thenJson(200, ok);
+    fake.answer(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': '3' })).answerJson(200, ok);
 
     await client().showMe();
 
@@ -99,7 +99,7 @@ describe('retry', () => {
   it('waits nothing for a Retry-After date in the past', async () => {
     const { fake, waits, client } = setup();
     const past = new Date(Date.now() - 5 * 60_000).toUTCString();
-    fake.then(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': past })).thenJson(200, ok);
+    fake.answer(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': past })).answerJson(200, ok);
 
     await client().showMe();
 
@@ -109,7 +109,7 @@ describe('retry', () => {
   it('waits until a Retry-After date in the future', async () => {
     const { fake, waits, client } = setup();
     const future = new Date(Date.now() + 60_000).toUTCString();
-    fake.then(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': future })).thenJson(200, ok);
+    fake.answer(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': future })).answerJson(200, ok);
 
     await client().showMe();
 
@@ -119,7 +119,7 @@ describe('retry', () => {
 
   it('never retries a plan limit', async () => {
     const { fake, client } = setup();
-    fake.thenError(429, 'PLAN_LIMIT_EXCEEDED').thenJson(200, ok);
+    fake.answerError(429, 'PLAN_LIMIT_EXCEEDED').answerJson(200, ok);
 
     await expect(client().showMe()).rejects.toBeInstanceOf(PlanLimitExceededError);
 
@@ -128,7 +128,7 @@ describe('retry', () => {
 
   it('never retries a client error', async () => {
     const { fake, client } = setup();
-    fake.thenError(404, 'CUSTOMER_NOT_FOUND').thenJson(200, ok);
+    fake.answerError(404, 'CUSTOMER_NOT_FOUND').answerJson(200, ok);
 
     await expect(client().showMe()).rejects.toBeInstanceOf(NotFoundError);
 
@@ -137,7 +137,7 @@ describe('retry', () => {
 
   it('sends once with zero retries', async () => {
     const { fake, client } = setup({ maxRetries: 0 });
-    fake.thenError(503, 'INTERNAL_ERROR').thenJson(200, ok);
+    fake.answerError(503, 'INTERNAL_ERROR').answerJson(200, ok);
 
     await expect(client().showMe()).rejects.toBeInstanceOf(ServerError);
 
@@ -147,9 +147,9 @@ describe('retry', () => {
   it('retries PUT, PATCH and DELETE', async () => {
     const { fake, client } = setup();
     fake
-      .thenError(503, 'INTERNAL_ERROR').thenJson(200, ok)
-      .thenError(503, 'INTERNAL_ERROR').thenJson(200, ok)
-      .thenError(503, 'INTERNAL_ERROR').then(() => new Response(null, { status: 204 }));
+      .answerError(503, 'INTERNAL_ERROR').answerJson(200, ok)
+      .answerError(503, 'INTERNAL_ERROR').answerJson(200, ok)
+      .answerError(503, 'INTERNAL_ERROR').answer(() => new Response(null, { status: 204 }));
     const puntjes = client();
 
     await puntjes.upsertProduct({ path: { externalId: 'p1' }, body: { name: 'Bread' } as never });
@@ -161,7 +161,7 @@ describe('retry', () => {
 
   it('keeps the Content-Type of a retried POST', async () => {
     const { fake, client } = setup();
-    fake.thenError(503, 'INTERNAL_ERROR').thenJson(201, ok);
+    fake.answerError(503, 'INTERNAL_ERROR').answerJson(201, ok);
 
     await record(client(), 'key-1');
 
@@ -170,7 +170,7 @@ describe('retry', () => {
 
   it('says how long a rate limit asks to wait when it gives up', async () => {
     const { fake, client } = setup({ maxRetries: 0 });
-    fake.then(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': '7' }));
+    fake.answer(() => errorResponse(429, 'RATE_LIMITED', 'req-1', { 'Retry-After': '7' }));
 
     const error = await client().showMe().catch((e: unknown) => e);
 
@@ -180,16 +180,18 @@ describe('retry', () => {
 
   it('times out a GET that hangs and retries it', async () => {
     const { fake, client } = setup({ timeout: 50 });
-    fake.thenHang().thenJson(200, ok);
+    fake.answerHang().answerJson(200, ok);
+    const started = performance.now();
 
     await client().showMe();
 
+    expect(performance.now() - started).toBeGreaterThanOrEqual(45);
     expect(fake.requests).toHaveLength(2);
   });
 
   it('makes a POST without a key that hangs a TransportError', async () => {
     const { fake, client } = setup({ timeout: 50 });
-    fake.thenHang().thenJson(201, ok);
+    fake.answerHang().answerJson(201, ok);
 
     const error = await record(client(), null).catch((e: unknown) => e);
 
@@ -205,7 +207,7 @@ describe('retry', () => {
         controller.error(new TypeError('terminated'));
       },
     });
-    fake.then(() => new Response(broken, { status: 200, headers: { 'Content-Type': 'application/json' } })).thenJson(200, ok);
+    fake.answer(() => new Response(broken, { status: 200, headers: { 'Content-Type': 'application/json' } })).answerJson(200, ok);
 
     await client().showMe();
 
@@ -214,7 +216,7 @@ describe('retry', () => {
 
   it('does not treat a caller cancellation as a timeout', async () => {
     const { fake, client } = setup();
-    fake.thenHang();
+    fake.answerHang();
 
     const error = await client().showMe({ signal: AbortSignal.timeout(30) }).catch((e: unknown) => e);
 
@@ -225,7 +227,7 @@ describe('retry', () => {
 
   it('reads the body of a successful answer after the retry layer buffered it', async () => {
     const { fake, client } = setup();
-    fake.then(() => json(200, { data: { name: 'Bakery' } }));
+    fake.answer(() => json(200, { data: { name: 'Bakery' } }));
 
     const { data } = await client().showMe();
 
