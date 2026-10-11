@@ -20,8 +20,8 @@ export interface PuntjesOptions {
   clientSecret: string;
   /** The Puntjes host, with or without `/api/v1`. Production by default. */
   baseUrl?: string;
-  /** A fetch to send every request through, for a proxy or a test. The global fetch by default. */
-  fetch?: (request: Request) => Promise<Response>;
+  /** A fetch to send every request through, for a proxy or a test; it must honour `init.signal`. The global fetch by default. */
+  fetch?: (request: Request, init: { signal?: AbortSignal }) => Promise<Response>;
   /** How many times a failed call that is safe to repeat is sent again. 2 by default. */
   maxRetries?: number;
   /** The first wait before a retry, in milliseconds, doubled for each next one. 500 by default. */
@@ -41,7 +41,7 @@ export function createPuntjes(options: PuntjesOptions): PuntjesApi {
   }
 
   const host = hostOf(options.baseUrl ?? DEFAULT_BASE_URL);
-  const transport: Fetch = options.fetch ?? ((request) => globalThis.fetch(request));
+  const transport: Fetch = (request, init = {}) => (options.fetch ?? globalThis.fetch)(request, init);
   const retry = {
     maxRetries: options.maxRetries ?? 2,
     retryBaseDelay: options.retryBaseDelay ?? 500,

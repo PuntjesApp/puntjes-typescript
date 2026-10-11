@@ -5,10 +5,10 @@ import type { Fetch } from './fetch.js';
 
 /** The outermost layer: a non-2xx response becomes its family error, a failed connection a `TransportError`. */
 export function errorFetch(next: Fetch): Fetch {
-  return async (request) => {
+  return async (request, init) => {
     let response: Response;
     try {
-      response = await next(request);
+      response = await next(request, init);
     } catch (error) {
       if (!isNetworkFailure(error) || request.signal.aborted) {
         throw error;

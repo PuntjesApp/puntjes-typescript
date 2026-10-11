@@ -1,6 +1,6 @@
 # @puntjes/sdk
 
-The official TypeScript client for the [Puntjes](https://puntjes.app) loyalty API. It runs on Node 20.3 or later and
+The official TypeScript client for the [Puntjes](https://puntjes.app) loyalty API. It runs on Node 20 or later and
 ships as an ES module with its own types.
 
 ```bash
@@ -51,7 +51,7 @@ const puntjes = createPuntjes({
   retryBaseDelay: 500,            // milliseconds before the first retry, doubled for each next one
   timeout: 30_000,                // milliseconds per attempt
   tokenStore: myRedisStore,       // a TokenStore; memory by default
-  fetch: myFetch,                 // a fetch for a proxy or a test; the global fetch by default
+  fetch: myFetch,                 // (request, init) => Response, for a proxy or a test; pass init.signal on
 });
 ```
 

@@ -7,20 +7,20 @@ import type { Fetch } from './fetch.js';
  * operation carries no header and passes untouched.
  */
 export function authFetch(next: Fetch, tokens: TokenSource): Fetch {
-  return async (request) => {
+  return async (request, init) => {
     if (!request.headers.has('Authorization')) {
-      return next(request);
+      return next(request, init);
     }
 
     const token = await tokens.get();
-    const response = await next(signed(request.clone(), token));
+    const response = await next(signed(request.clone(), token), init);
     if (response.status !== 401) {
       return response;
     }
 
     await tokens.forget(token);
 
-    return next(signed(request, await tokens.get()));
+    return next(signed(request, await tokens.get()), init);
   };
 }
 

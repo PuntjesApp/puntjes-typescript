@@ -9,7 +9,7 @@ export interface SentRequest {
   contentType: string | null;
 }
 
-type Answer = (request: Request) => Response | Promise<Response>;
+type Answer = (request: Request, signal: AbortSignal) => Response | Promise<Response>;
 
 export const json = (status: number, body: unknown, headers: Record<string, string> = {}): Response =>
   new Response(typeof body === 'string' ? body : JSON.stringify(body), {
@@ -33,10 +33,11 @@ export class FakeFetch {
   private apiCalls = 0;
   private readonly answers: Answer[] = [];
 
-  readonly fetch = async (request: Request): Promise<Response> => {
+  readonly fetch = async (request: Request, init: { signal?: AbortSignal } = {}): Promise<Response> => {
+    const signal = init.signal ?? request.signal;
     const body = await request.text();
     if (this.latency > 0) {
-      await wait(this.latency, request.signal);
+      await wait(this.latency, signal);
     }
 
     if (new URL(request.url).pathname === '/oauth/token') {
@@ -47,7 +48,7 @@ export class FakeFetch {
 
     this.apiCalls += 1;
     if (this.apiLatency) {
-      await wait(this.apiLatency(this.apiCalls), request.signal);
+      await wait(this.apiLatency(this.apiCalls), signal);
     }
 
     this.requests.push({
@@ -64,7 +65,7 @@ export class FakeFetch {
       throw new Error(`No answer queued for ${request.method} ${request.url}.`);
     }
 
-    return answer(request);
+    return answer(request, signal);
   };
 
   answer(answer: Answer): this {
@@ -93,7 +94,7 @@ export class FakeFetch {
   }
 
   answerHang(): this {
-    return this.answer((request) => wait(Number.POSITIVE_INFINITY, request.signal).then(() => json(200, {})));
+    return this.answer((_request, signal) => wait(Number.POSITIVE_INFINITY, signal).then(() => json(200, {})));
   }
 
   client(options: Partial<PuntjesOptions> = {}) {

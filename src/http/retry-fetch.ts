@@ -23,11 +23,22 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
     const retries = options.repeatEveryMethod || isSafeToRepeat(request.method, body) ? options.maxRetries : 0;
 
     for (let attempt = 0; ; attempt++) {
-      const timeout = AbortSignal.timeout(options.timeout);
-      const signal = AbortSignal.any([request.signal, timeout]);
+      const attemptSignal = new AbortController();
+      let timedOut = false;
+      const timer = setTimeout(() => {
+        timedOut = true;
+        attemptSignal.abort(new DOMException('The attempt timed out.', 'TimeoutError'));
+      }, options.timeout);
+      const forwardAbort = () => attemptSignal.abort(request.signal.reason);
+      request.signal.addEventListener('abort', forwardAbort, { once: true });
+      const signal = attemptSignal.signal;
       let response: Response;
       try {
-        const sent = await next(new Request(request, body === null ? { signal } : { body, signal }));
+        if (request.signal.aborted) {
+          throw request.signal.reason;
+        }
+
+        const sent = await next(withBody(request, body), { signal });
         const buffered = await sent.arrayBuffer();
         response = new Response(buffered.byteLength === 0 ? null : buffered, sent);
       } catch (error) {
@@ -35,7 +46,7 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
           throw request.signal.reason;
         }
 
-        if (!timeout.aborted && !isNetworkFailure(error)) {
+        if (!timedOut && !isNetworkFailure(error)) {
           throw error;
         }
 
@@ -44,11 +55,14 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
           continue;
         }
 
-        if (timeout.aborted) {
+        if (timedOut) {
           throw new TransportError(`The Puntjes API did not answer within ${options.timeout / 1000} seconds.`, { cause: error });
         }
 
         throw error;
+      } finally {
+        clearTimeout(timer);
+        request.signal.removeEventListener('abort', forwardAbort);
       }
 
       if (attempt >= retries || !(await isTransient(response))) {
@@ -63,6 +77,10 @@ export function retryFetch(next: Fetch, options: RetryOptions): Fetch {
 /** fetch rejects with a TypeError when the connection fails or the body breaks while it is read. */
 export function isNetworkFailure(error: unknown): boolean {
   return error instanceof TypeError;
+}
+
+function withBody(request: Request, body: ArrayBuffer | null): Request {
+  return body === null ? new Request(request) : new Request(request, { body });
 }
 
 function isSafeToRepeat(method: string, body: ArrayBuffer | null): boolean {
