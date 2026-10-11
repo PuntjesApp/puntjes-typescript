@@ -19,6 +19,9 @@ updates:
       # hey-api crashes on ts.SyntaxKind under TypeScript 7.
       - dependency-name: typescript
         update-types: [version-update:semver-major]
+      # The types follow the oldest Node the package supports, so a newer major would type APIs Node 20 lacks.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
     groups:
       dev-tools:
         patterns: ["*"]
