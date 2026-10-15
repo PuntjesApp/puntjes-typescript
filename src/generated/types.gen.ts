@@ -2041,6 +2041,10 @@ export type DownloadWalletPassErrors = {
      * Something went wrong on our side. Quote the request_id when you report it.
      */
     500: ErrorResponse;
+    /**
+     * A service the request needs is not ready yet. Retry after the seconds in the Retry-After header.
+     */
+    503: ErrorResponse;
 };
 
 export type DownloadWalletPassError = DownloadWalletPassErrors[keyof DownloadWalletPassErrors];
