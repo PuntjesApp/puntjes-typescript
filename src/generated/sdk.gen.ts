@@ -2,7 +2,7 @@
 
 import { client } from './client.gen.js';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index.js';
-import type { AdjustWalletData, AdjustWalletErrors, AdjustWalletResponses, BulkUpsertProductsData, BulkUpsertProductsErrors, BulkUpsertProductsResponses, CheckHealthData, CheckHealthErrors, CheckHealthResponses, CreateProductData2, CreateProductErrors, CreateProductResponses, CreateRewardFromProductData2, CreateRewardFromProductErrors, CreateRewardFromProductResponses, DeleteProductData, DeleteProductErrors, DeleteProductResponses, DownloadWalletPassData, DownloadWalletPassErrors, DownloadWalletPassResponses, LinkCustomerExternalIdData, LinkCustomerExternalIdErrors, LinkCustomerExternalIdResponses, ListCampaignsData, ListCampaignsErrors, ListCampaignsResponses, ListCustomerRedemptionsData, ListCustomerRedemptionsErrors, ListCustomerRedemptionsResponses, ListCustomerTransactionsData, ListCustomerTransactionsErrors, ListCustomerTransactionsResponses, ListCustomerVouchersData, ListCustomerVouchersErrors, ListCustomerVouchersResponses, ListLedgerEntriesData, ListLedgerEntriesErrors, ListLedgerEntriesResponses, ListProductsData, ListProductsErrors, ListProductsResponses, ListRewardsData, ListRewardsErrors, ListRewardsResponses, LookupCustomerData, LookupCustomerErrors, LookupCustomerResponses, LookupRedemptionData, LookupRedemptionErrors, LookupRedemptionResponses, LookupVoucherData, LookupVoucherErrors, LookupVoucherResponses, RedeemRewardData, RedeemRewardErrors, RedeemRewardResponses, RegisterCustomerData, RegisterCustomerErrors, RegisterCustomerResponses, ReplaceCustomerByExternalIdData, ReplaceCustomerByExternalIdErrors, ReplaceCustomerByExternalIdResponses, SendLoyaltyCardByExternalIdData, SendLoyaltyCardByExternalIdErrors, SendLoyaltyCardByExternalIdResponses, SendLoyaltyCardData, SendLoyaltyCardErrors, SendLoyaltyCardResponses, ShowCustomerData, ShowCustomerErrors, ShowCustomerResponses, ShowMeData, ShowMeErrors, ShowMeResponses, ShowProductData, ShowProductErrors, ShowProductResponses, ShowStatisticsData, ShowStatisticsErrors, ShowStatisticsResponses, ShowWalletData, ShowWalletErrors, ShowWalletResponses, SubmitTransactionData, SubmitTransactionErrors, SubmitTransactionResponses, UpdateCustomerByExternalIdData, UpdateCustomerByExternalIdErrors, UpdateCustomerByExternalIdResponses, UpdateProductData2, UpdateProductErrors, UpdateProductResponses, UpsertProductData2, UpsertProductErrors, UpsertProductResponses, VerifyRedemptionData, VerifyRedemptionErrors, VerifyRedemptionResponses, VerifyVoucherData, VerifyVoucherErrors, VerifyVoucherResponses } from './types.gen.js';
+import type { AdjustWalletData, AdjustWalletErrors, AdjustWalletResponses, BulkUpsertProductsData, BulkUpsertProductsErrors, BulkUpsertProductsResponses, CheckHealthData, CheckHealthErrors, CheckHealthResponses, CreateProductData2, CreateProductErrors, CreateProductResponses, CreateRewardFromProductData2, CreateRewardFromProductErrors, CreateRewardFromProductResponses, DeleteProductData, DeleteProductErrors, DeleteProductResponses, DownloadWalletPassData, DownloadWalletPassErrors, DownloadWalletPassResponses, LinkCustomerExternalIdData, LinkCustomerExternalIdErrors, LinkCustomerExternalIdResponses, ListBranchesData, ListBranchesErrors, ListBranchesResponses, ListCampaignsData, ListCampaignsErrors, ListCampaignsResponses, ListCustomerRedemptionsData, ListCustomerRedemptionsErrors, ListCustomerRedemptionsResponses, ListCustomerTransactionsData, ListCustomerTransactionsErrors, ListCustomerTransactionsResponses, ListCustomerVouchersData, ListCustomerVouchersErrors, ListCustomerVouchersResponses, ListLedgerEntriesData, ListLedgerEntriesErrors, ListLedgerEntriesResponses, ListProductsData, ListProductsErrors, ListProductsResponses, ListRewardsData, ListRewardsErrors, ListRewardsResponses, LookupCustomerData, LookupCustomerErrors, LookupCustomerResponses, LookupRedemptionData, LookupRedemptionErrors, LookupRedemptionResponses, LookupVoucherData, LookupVoucherErrors, LookupVoucherResponses, RedeemRewardData, RedeemRewardErrors, RedeemRewardResponses, RegisterCustomerData, RegisterCustomerErrors, RegisterCustomerResponses, ReplaceCustomerByExternalIdData, ReplaceCustomerByExternalIdErrors, ReplaceCustomerByExternalIdResponses, SendLoyaltyCardByExternalIdData, SendLoyaltyCardByExternalIdErrors, SendLoyaltyCardByExternalIdResponses, SendLoyaltyCardData, SendLoyaltyCardErrors, SendLoyaltyCardResponses, ShowCustomerData, ShowCustomerErrors, ShowCustomerResponses, ShowMeData, ShowMeErrors, ShowMeResponses, ShowProductData, ShowProductErrors, ShowProductResponses, ShowStatisticsData, ShowStatisticsErrors, ShowStatisticsResponses, ShowWalletData, ShowWalletErrors, ShowWalletResponses, SubmitTransactionData, SubmitTransactionErrors, SubmitTransactionResponses, UpdateCustomerByExternalIdData, UpdateCustomerByExternalIdErrors, UpdateCustomerByExternalIdResponses, UpdateProductData2, UpdateProductErrors, UpdateProductResponses, UpsertProductData2, UpsertProductErrors, UpsertProductResponses, VerifyRedemptionData2, VerifyRedemptionErrors, VerifyRedemptionResponses, VerifyVoucherData, VerifyVoucherErrors, VerifyVoucherResponses } from './types.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -65,14 +65,14 @@ export class PuntjesApi extends HeyApiClient {
         });
     }
     
-    public registerCustomer<ThrowOnError extends boolean = true>(options: Options<RegisterCustomerData, ThrowOnError>): RequestResult<RegisterCustomerResponses, RegisterCustomerErrors, ThrowOnError> {
-        return (options.client ?? this.client).post<RegisterCustomerResponses, RegisterCustomerErrors, ThrowOnError>({
+    public registerCustomer<ThrowOnError extends boolean = true>(options?: Options<RegisterCustomerData, ThrowOnError>): RequestResult<RegisterCustomerResponses, RegisterCustomerErrors, ThrowOnError> {
+        return (options?.client ?? this.client).post<RegisterCustomerResponses, RegisterCustomerErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/customers',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
-                ...options.headers
+                ...options?.headers
             }
         });
     }
@@ -237,11 +237,15 @@ export class PuntjesApi extends HeyApiClient {
         });
     }
     
-    public verifyRedemption<ThrowOnError extends boolean = true>(options: Options<VerifyRedemptionData, ThrowOnError>): RequestResult<VerifyRedemptionResponses, VerifyRedemptionErrors, ThrowOnError> {
+    public verifyRedemption<ThrowOnError extends boolean = true>(options: Options<VerifyRedemptionData2, ThrowOnError>): RequestResult<VerifyRedemptionResponses, VerifyRedemptionErrors, ThrowOnError> {
         return (options.client ?? this.client).post<VerifyRedemptionResponses, VerifyRedemptionErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/redemptions/{code}/verify',
-            ...options
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
         });
     }
     
@@ -377,6 +381,14 @@ export class PuntjesApi extends HeyApiClient {
         return (options?.client ?? this.client).get<ShowMeResponses, ShowMeErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/me',
+            ...options
+        });
+    }
+    
+    public listBranches<ThrowOnError extends boolean = true>(options?: Options<ListBranchesData, ThrowOnError>): RequestResult<ListBranchesResponses, ListBranchesErrors, ThrowOnError> {
+        return (options?.client ?? this.client).get<ListBranchesResponses, ListBranchesErrors, ThrowOnError>({
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/branches',
             ...options
         });
     }
