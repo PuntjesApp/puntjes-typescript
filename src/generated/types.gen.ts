@@ -927,6 +927,10 @@ export type RedemptionCreatedData = {
     } & DiscountRedemptionData) | ({
         type: 'free_product';
     } & FreeProductRedemptionData);
+    /**
+     * The branches the reward has now; null means every branch.
+     */
+    branches: Array<BranchReferenceData> | null;
 };
 
 /**
@@ -957,6 +961,10 @@ export type RedemptionLookupData = {
     } & DiscountRedemptionData) | ({
         type: 'free_product';
     } & FreeProductRedemptionData);
+    /**
+     * The branches the reward has now; null means every branch.
+     */
+    branches: Array<BranchReferenceData> | null;
 };
 
 /**
@@ -965,6 +973,10 @@ export type RedemptionLookupData = {
 export type RedemptionRewardData = {
     name: string;
     type: string;
+    /**
+     * The reward's id, the one GET /rewards lists.
+     */
+    id: number;
 };
 
 /**
@@ -985,6 +997,10 @@ export type RedemptionVerificationData = {
     } & DiscountRedemptionData) | ({
         type: 'free_product';
     } & FreeProductRedemptionData);
+    /**
+     * The branches the reward has now; null means every branch.
+     */
+    branches: Array<BranchReferenceData> | null;
 };
 
 /**
@@ -1252,12 +1268,21 @@ export type VendorBrandingData = {
     logo_url: string | null;
     brand_color_primary: string | null;
     brand_color_accent: string | null;
+    default_branch: BranchReferenceData | null;
 };
 
 /**
  * VerifyCampaignVoucherData
  */
 export type VerifyCampaignVoucherData = {
+    branch?: string | null;
+    idempotency_key?: string | null;
+};
+
+/**
+ * VerifyRedemptionData
+ */
+export type VerifyRedemptionData = {
     branch?: string | null;
     idempotency_key?: string | null;
 };
@@ -1429,7 +1454,7 @@ export type LookupCustomerResponses = {
 export type LookupCustomerResponse = LookupCustomerResponses[keyof LookupCustomerResponses];
 
 export type RegisterCustomerData = {
-    body: CreateCustomerData;
+    body?: CreateCustomerData;
     path?: never;
     query?: never;
     url: '/customers';
@@ -1481,7 +1506,7 @@ export type RegisterCustomerResponses = {
 export type RegisterCustomerResponse = RegisterCustomerResponses[keyof RegisterCustomerResponses];
 
 export type UpdateCustomerByExternalIdData = {
-    body: UpdateCustomerData;
+    body?: UpdateCustomerData;
     path: {
         externalId: string | null;
     };
@@ -1539,7 +1564,7 @@ export type UpdateCustomerByExternalIdResponses = {
 export type UpdateCustomerByExternalIdResponse = UpdateCustomerByExternalIdResponses[keyof UpdateCustomerByExternalIdResponses];
 
 export type ReplaceCustomerByExternalIdData = {
-    body: UpdateCustomerData;
+    body?: UpdateCustomerData;
     path: {
         externalId: string | null;
     };
@@ -1653,7 +1678,7 @@ export type LinkCustomerExternalIdResponses = {
 export type LinkCustomerExternalIdResponse = LinkCustomerExternalIdResponses[keyof LinkCustomerExternalIdResponses];
 
 export type SendLoyaltyCardByExternalIdData = {
-    body: SendLoyaltyCardRequestData;
+    body?: SendLoyaltyCardRequestData;
     path: {
         externalId: string | null;
     };
@@ -1707,7 +1732,7 @@ export type SendLoyaltyCardByExternalIdResponses = {
 export type SendLoyaltyCardByExternalIdResponse = SendLoyaltyCardByExternalIdResponses[keyof SendLoyaltyCardByExternalIdResponses];
 
 export type SendLoyaltyCardData = {
-    body: SendLoyaltyCardRequestData;
+    body?: SendLoyaltyCardRequestData;
     path: {
         customer: string | null;
     };
@@ -2301,8 +2326,8 @@ export type LookupRedemptionResponses = {
 
 export type LookupRedemptionResponse = LookupRedemptionResponses[keyof LookupRedemptionResponses];
 
-export type VerifyRedemptionData = {
-    body?: never;
+export type VerifyRedemptionData2 = {
+    body?: VerifyRedemptionData;
     path: {
         code: string | null;
     };
@@ -2311,6 +2336,10 @@ export type VerifyRedemptionData = {
 };
 
 export type VerifyRedemptionErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
     /**
      * The credential is missing, malformed, or not accepted.
      */
@@ -2644,7 +2673,7 @@ export type ShowProductResponses = {
 export type ShowProductResponse = ShowProductResponses[keyof ShowProductResponses];
 
 export type UpdateProductData2 = {
-    body: UpdateProductData;
+    body?: UpdateProductData;
     path: {
         externalId: string | null;
     };
@@ -2882,7 +2911,7 @@ export type LookupVoucherResponses = {
 export type LookupVoucherResponse = LookupVoucherResponses[keyof LookupVoucherResponses];
 
 export type VerifyVoucherData = {
-    body: VerifyCampaignVoucherData;
+    body?: VerifyCampaignVoucherData;
     path: {
         code: string | null;
     };
@@ -3018,6 +3047,42 @@ export type ShowMeResponses = {
 };
 
 export type ShowMeResponse = ShowMeResponses[keyof ShowMeResponses];
+
+export type ListBranchesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/branches';
+};
+
+export type ListBranchesErrors = {
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type ListBranchesError = ListBranchesErrors[keyof ListBranchesErrors];
+
+export type ListBranchesResponses = {
+    200: {
+        data: Array<BranchReferenceData>;
+    };
+};
+
+export type ListBranchesResponse = ListBranchesResponses[keyof ListBranchesResponses];
 
 export type CheckHealthData = {
     body?: never;
