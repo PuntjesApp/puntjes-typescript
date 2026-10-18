@@ -3,6 +3,14 @@
 ## [2.2.0](https://github.com/PuntjesApp/puntjes-typescript/compare/v2.1.0...v2.2.0) (2026-10-18)
 
 
+### ⚠ Breaking
+
+* The name `VerifyRedemptionData` now means the new body of `verifyRedemption` (`branch`, `idempotency_key`). The options type of that call is now `VerifyRedemptionData2`. Calls such as `verifyRedemption({ path: { code } })` still work. Code that names the type breaks.
+  * before: `Options<VerifyRedemptionData>`, `VerifyRedemptionData['path']`
+  * after: `Options<VerifyRedemptionData2>`, `VerifyRedemptionData2['path']`
+* The `body` of seven request types is now optional, so `Data['body']` can be `undefined`: `RegisterCustomerData`, `ReplaceCustomerByExternalIdData`, `SendLoyaltyCardByExternalIdData`, `SendLoyaltyCardData`, `UpdateCustomerByExternalIdData`, `UpdateProductData2`, `VerifyVoucherData`. The `options` argument of `registerCustomer` is now optional too.
+* These response types gained a required field, which breaks code that builds them by hand, such as test mocks: `branches` on `RedemptionCreatedData`, `RedemptionLookupData` and `RedemptionVerificationData`, `id` on `RedemptionRewardData`, `default_branch` on `VendorBrandingData`. `VerifyRedemptionErrors` gained status `400`.
+
 ### Features
 
 * regenerate from puntjes-openapi v2.2.0 ([#9](https://github.com/PuntjesApp/puntjes-typescript/issues/9)) ([cec589e](https://github.com/PuntjesApp/puntjes-typescript/commit/cec589ef5e2570299fb253c08f632836967cd77f))

@@ -130,7 +130,9 @@ to `fix:` when the regenerated code changes, so release-please ships it as its o
 - `npm run generate` regenerates it: hey-api, then `tools/codegen.ts` for the `ErrorCode` list. hey-api is pinned to
   an exact version, and TypeScript is pinned to 5 beside it, because hey-api fails under TypeScript 7.
 - When Puntjes publishes a new API spec, `.github/workflows/regenerate.yml` opens a PR with the new code. A minor or
-  patch spec merges itself when CI is green; a major one waits for a person.
+  patch spec merges itself when CI is green; a major one waits for a person. CI also compares the public API with the
+  last release on npm (`tools/bc-check.ts`). A PR that removes or changes a public declaration fails until its title
+  is `feat!:` or `fix!:`, or its body has a `BREAKING CHANGE:` line.
 - `.github/workflows/release.yml` runs release-please. Its release PR merges itself when CI is green, and the tag
   publishes the package to npm with provenance.
 
