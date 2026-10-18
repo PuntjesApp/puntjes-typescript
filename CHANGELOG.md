@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/PuntjesApp/puntjes-typescript/compare/v2.1.0...v2.2.0) (2026-10-18)
+
+
+### Features
+
+* regenerate from puntjes-openapi v2.2.0 ([#9](https://github.com/PuntjesApp/puntjes-typescript/issues/9)) ([cec589e](https://github.com/PuntjesApp/puntjes-typescript/commit/cec589ef5e2570299fb253c08f632836967cd77f))
+
 ## [2.1.0](https://github.com/PuntjesApp/puntjes-typescript/compare/v2.0.0...v2.1.0) (2026-10-15)
 
 
