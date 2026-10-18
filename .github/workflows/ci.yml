@@ -2,6 +2,8 @@ name: CI
 
 on:
   pull_request:
+    # edited: a retitle to feat!: runs the compatibility check again.
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
 
@@ -59,6 +61,34 @@ jobs:
           ../../node_modules/.bin/tsc -p .
           node dist/index.js
 
+  # The release PR carries breaks that merged earlier under a feat!: title, so it is not checked again. A PR opened
+  # while such a break waits for its release reports that break too: wait for the release, or retitle the PR.
+  compatibility:
+    name: No break without feat!
+    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'release-please--')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run build
+      - name: Unpack the last release from npm
+        run: |
+          version=$(npm view @puntjes/sdk dist-tags.latest)
+          mkdir -p "$RUNNER_TEMP/last-release"
+          npm pack "@puntjes/sdk@$version" --pack-destination "$RUNNER_TEMP/last-release"
+          tar -xzf "$RUNNER_TEMP/last-release"/puntjes-sdk-*.tgz -C "$RUNNER_TEMP/last-release" --strip-components=1
+      - name: Compare the public API with the last release
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node tools/bc-check.ts "$RUNNER_TEMP/last-release/dist/index.d.ts" dist/index.d.ts
+
   # A hand edit under src/generated, or a generator bump with no regeneration, turns this red.
   generated:
     name: Generated code matches the spec
@@ -95,7 +125,7 @@ jobs:
   # The one check the main ruleset requires, so a change to the jobs above never edits the ruleset.
   ci:
     name: CI
-    needs: [test, package, generated, workflows]
+    needs: [test, package, generated, workflows, compatibility]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -106,4 +136,8 @@ jobs:
           PACKAGE: ${{ needs.package.result }}
           GENERATED: ${{ needs.generated.result }}
           WORKFLOWS: ${{ needs.workflows.result }}
-        run: test "$TEST" = success && test "$PACKAGE" = success && test "$GENERATED" = success && test "$WORKFLOWS" = success
+          COMPATIBILITY: ${{ needs.compatibility.result }}
+        # compatibility is skipped on a push and on the release PR.
+        run: |
+          test "$TEST" = success && test "$PACKAGE" = success && test "$GENERATED" = success && test "$WORKFLOWS" = success
+          test "$COMPATIBILITY" = success || test "$COMPATIBILITY" = skipped

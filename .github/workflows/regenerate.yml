@@ -2,6 +2,7 @@ name: Regenerate
 
 # PuntjesApp/Puntjes sends spec-published after a release publishes a new api.json to puntjes-openapi. This turns it
 # into a PR with the regenerated client. A minor or patch PR merges itself when CI is green; a major one waits.
+# CI also compares the public API with the last release: a minor PR that breaks it stays red until it is retitled feat!:.
 on:
   repository_dispatch:
     types: [spec-published]
