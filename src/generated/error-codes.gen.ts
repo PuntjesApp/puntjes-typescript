@@ -17,6 +17,7 @@ export const ErrorCode = {
   CustomerNotFound: 'CUSTOMER_NOT_FOUND',
   ExternalIdDuplicate: 'EXTERNAL_ID_DUPLICATE',
   ExternalIdNotFound: 'EXTERNAL_ID_NOT_FOUND',
+  FeatureNotEnabled: 'FEATURE_NOT_ENABLED',
   Forbidden: 'FORBIDDEN',
   IdempotencyKeyConflict: 'IDEMPOTENCY_KEY_CONFLICT',
   IdentifierDuplicate: 'IDENTIFIER_DUPLICATE',
@@ -51,6 +52,7 @@ export const ErrorCode = {
   VerificationFailed: 'VERIFICATION_FAILED',
   VoucherAlreadyUsed: 'VOUCHER_ALREADY_USED',
   VoucherExpired: 'VOUCHER_EXPIRED',
+  VoucherGroupRequired: 'VOUCHER_GROUP_REQUIRED',
   VoucherNotFound: 'VOUCHER_NOT_FOUND',
   WalletNotFound: 'WALLET_NOT_FOUND',
 } as const;
@@ -74,6 +76,7 @@ export const errorCodeStatus: Record<ErrorCode, number> = {
   CUSTOMER_NOT_FOUND: 404,
   EXTERNAL_ID_DUPLICATE: 409,
   EXTERNAL_ID_NOT_FOUND: 404,
+  FEATURE_NOT_ENABLED: 403,
   FORBIDDEN: 403,
   IDEMPOTENCY_KEY_CONFLICT: 422,
   IDENTIFIER_DUPLICATE: 409,
@@ -108,6 +111,7 @@ export const errorCodeStatus: Record<ErrorCode, number> = {
   VERIFICATION_FAILED: 422,
   VOUCHER_ALREADY_USED: 422,
   VOUCHER_EXPIRED: 422,
+  VOUCHER_GROUP_REQUIRED: 422,
   VOUCHER_NOT_FOUND: 404,
   WALLET_NOT_FOUND: 404,
 };

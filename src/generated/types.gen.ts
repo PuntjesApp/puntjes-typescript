@@ -40,6 +40,10 @@ export type AnniversaryCampaignConfigData = {
      */
     branch_ids?: Array<number>;
     /**
+     * The groups this campaign is for. Absent or empty means everyone.
+     */
+    customer_group_ids?: Array<number>;
+    /**
      * Which shape this is.
      */
     type: 'anniversary';
@@ -134,6 +138,10 @@ export type CampaignListData = {
     branches: Array<BranchReferenceData> | null;
     created_at: string | null;
     updated_at: string | null;
+    /**
+     * Who the campaign is for. Empty means every customer.
+     */
+    customer_groups: Array<CustomerGroupReferenceData>;
 };
 
 /**
@@ -164,7 +172,7 @@ export type CampaignStatusData = {
 export type CampaignVoucherLookupData = {
     voucher_code: string;
     /**
-     * How much comes off, for a discount bon. Its `type` says which shape this is.
+     * How much comes off, for a discount voucher. Its `type` says which shape this is.
      */
     discount: ({
         type: 'percentage';
@@ -173,19 +181,27 @@ export type CampaignVoucherLookupData = {
     } & VoucherFixedDiscountData);
     valid_until: string | null;
     /**
-     * When the bon was spent, or null while it is not.
+     * When the voucher was spent, or null while it is not.
      */
     consumed_at: string | null;
     campaign_id: number;
     kind: string;
     /**
-     * What to hand over, for a free-product bon.
+     * What to hand over, for a free-product voucher.
      */
     products: Array<VoucherGiftProductData> | null;
     /**
      * `valid`, `used` or `expired`.
      */
     status: string;
+    /**
+     * Groups that may spend it; empty means every customer.
+     */
+    customer_groups: Array<CustomerGroupReferenceData>;
+    /**
+     * Only true when `status` is `valid` and the customer is a member of none of its customer groups.
+     */
+    blocked_by_group: boolean;
 };
 
 /**
@@ -194,7 +210,7 @@ export type CampaignVoucherLookupData = {
 export type CampaignVoucherVerificationData = {
     voucher_code: string;
     /**
-     * How much comes off, for a discount bon. Its `type` says which shape this is.
+     * How much comes off, for a discount voucher. Its `type` says which shape this is.
      */
     discount: ({
         type: 'percentage';
@@ -206,7 +222,7 @@ export type CampaignVoucherVerificationData = {
     campaign_id: number;
     kind: string;
     /**
-     * What to hand over, for a free-product bon.
+     * What to hand over, for a free-product voucher.
      */
     products: Array<VoucherGiftProductData> | null;
 };
@@ -219,6 +235,13 @@ export type CategoryRevenueData = {
     units?: number;
     revenue?: number;
     isOther?: boolean;
+};
+
+/**
+ * ChangeExternalIdData
+ */
+export type ChangeExternalIdData = {
+    external_id: string;
 };
 
 /**
@@ -247,6 +270,7 @@ export type CreateCustomerData = {
     marketing_consent?: boolean | null;
     marketing_consent_statement_version?: string | null;
     identifiers?: Array<CreateIdentifierData>;
+    groups?: Array<CustomerGroupReferenceData>;
 };
 
 /**
@@ -357,6 +381,10 @@ export type CustomerData = {
     anonymized_at: string | null;
     created_at: string | null;
     updated_at: string | null;
+    /**
+     * The customer's groups, sorted by name, then by external_id.
+     */
+    groups: Array<CustomerGroupReferenceData>;
 };
 
 /**
@@ -391,6 +419,22 @@ export type CustomerDetailData = {
      * `true` for a deactivated customer; the key is absent for any other customer.
      */
     is_deactivated?: boolean;
+    /**
+     * The account a merge moved this closed account into, else `null`.
+     */
+    merged_into_customer_id: number | null;
+    /**
+     * The customer's groups, sorted by name, then by external_id.
+     */
+    groups: Array<CustomerGroupReferenceData>;
+};
+
+/**
+ * CustomerGroupReferenceData
+ */
+export type CustomerGroupReferenceData = {
+    external_id: string;
+    name: string;
 };
 
 /**
@@ -441,6 +485,14 @@ export type CustomerLookupData = {
      * `true` for a deactivated customer; the key is absent for any other customer.
      */
     is_deactivated?: boolean;
+    /**
+     * The account a merge moved this closed account into, else `null`.
+     */
+    merged_into_customer_id: number | null;
+    /**
+     * The customer's groups, sorted by name, then by external_id.
+     */
+    groups: Array<CustomerGroupReferenceData>;
 };
 
 /**
@@ -459,7 +511,7 @@ export type CustomerVoucherData = {
     campaign_id: number;
     kind: string;
     /**
-     * How much comes off, for a discount bon. Its `type` says which shape this is.
+     * How much comes off, for a discount voucher. Its `type` says which shape this is.
      */
     discount: ({
         type: 'percentage';
@@ -467,15 +519,15 @@ export type CustomerVoucherData = {
         type: 'fixed';
     } & VoucherFixedDiscountData);
     /**
-     * What to hand over, for a free-product bon.
+     * What to hand over, for a free-product voucher.
      */
     products: Array<VoucherGiftProductData> | null;
     /**
-     * The last day the bon can be spent, or null when it does not run out.
+     * The last day the voucher can be spent, or null when it does not run out.
      */
     valid_until: string | null;
     /**
-     * The branches that take the bon; null means every branch.
+     * The branches that take the voucher; null means every branch.
      */
     branches: Array<BranchReferenceData> | null;
 };
@@ -771,6 +823,24 @@ export type LoyaltyStatisticsData = {
 };
 
 /**
+ * MergeCustomersApiData
+ */
+export type MergeCustomersApiData = {
+    /**
+     * Id of the closed account; its rows go to the kept account, its points too if `add_points`.
+     */
+    source: number;
+    /**
+     * `true` adds the points of the closed account to the kept account; `false` drops them.
+     */
+    add_points: boolean;
+    /**
+     * Max 255 characters; the same request again answers 200, another is refused.
+     */
+    idempotency_key: string;
+};
+
+/**
  * MomentCampaignConfigData
  */
 export type MomentCampaignConfigData = {
@@ -788,6 +858,10 @@ export type MomentCampaignConfigData = {
      * The branches this campaign runs in. Absent or empty means all of them.
      */
     branch_ids?: Array<number>;
+    /**
+     * The groups this campaign is for. Absent or empty means everyone.
+     */
+    customer_group_ids?: Array<number>;
     /**
      * Which shape this is.
      */
@@ -820,6 +894,10 @@ export type NthPurchaseCampaignConfigData = {
      * The branches this campaign runs in. Absent or empty means all of them.
      */
     branch_ids?: Array<number>;
+    /**
+     * The groups this campaign is for. Absent or empty means everyone.
+     */
+    customer_group_ids?: Array<number>;
     /**
      * Which shape this is.
      */
@@ -1178,6 +1256,10 @@ export type TransactionCampaignConfigData = {
      */
     branch_ids?: Array<number>;
     /**
+     * The groups this campaign is for. Absent or empty means everyone.
+     */
+    customer_group_ids?: Array<number>;
+    /**
      * Which shape this is.
      */
     type: 'transaction';
@@ -1226,6 +1308,7 @@ export type UpdateCustomerData = {
     locale?: 'nl' | 'en' | null;
     marketing_consent?: boolean | null;
     marketing_consent_statement_version?: string | null;
+    groups?: Array<CustomerGroupReferenceData>;
 };
 
 /**
@@ -1329,7 +1412,7 @@ export type VoucherGiftProductData = {
      */
     id: number | null;
     /**
-     * The product name as it was when the bon was issued.
+     * The product name as it was when the voucher was issued.
      */
     name: string;
     /**
@@ -1337,7 +1420,7 @@ export type VoucherGiftProductData = {
      */
     quantity: number;
     /**
-     * The item number when the bon was issued, or null when it had none.
+     * The item number when the voucher was issued, or null when it had none.
      */
     product_reference: string | null;
 };
@@ -1400,6 +1483,10 @@ export type WinBackCampaignConfigData = {
      * The branches this campaign runs in. Absent or empty means all of them.
      */
     branch_ids?: Array<number>;
+    /**
+     * The groups this campaign is for. Absent or empty means everyone.
+     */
+    customer_group_ids?: Array<number>;
     /**
      * Which shape this is.
      */
@@ -1677,6 +1764,64 @@ export type LinkCustomerExternalIdResponses = {
 
 export type LinkCustomerExternalIdResponse = LinkCustomerExternalIdResponses[keyof LinkCustomerExternalIdResponses];
 
+export type ChangeCustomerExternalIdData = {
+    body: ChangeExternalIdData;
+    path: {
+        customer: string | null;
+    };
+    query?: never;
+    url: '/customers/{customer}/external-id';
+};
+
+export type ChangeCustomerExternalIdErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The route, or the record it names, does not exist.
+     */
+    404: ErrorResponse;
+    /**
+     * The request conflicts with something that already exists.
+     */
+    409: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type ChangeCustomerExternalIdError = ChangeCustomerExternalIdErrors[keyof ChangeCustomerExternalIdErrors];
+
+export type ChangeCustomerExternalIdResponses = {
+    200: {
+        data: CustomerDetailData;
+    };
+};
+
+export type ChangeCustomerExternalIdResponse = ChangeCustomerExternalIdResponses[keyof ChangeCustomerExternalIdResponses];
+
 export type SendLoyaltyCardByExternalIdData = {
     body?: SendLoyaltyCardRequestData;
     path: {
@@ -1826,6 +1971,60 @@ export type ShowCustomerResponses = {
 };
 
 export type ShowCustomerResponse = ShowCustomerResponses[keyof ShowCustomerResponses];
+
+export type MergeCustomersData = {
+    body: MergeCustomersApiData;
+    path: {
+        customer: string | null;
+    };
+    query?: never;
+    url: '/customers/{customer}/merge';
+};
+
+export type MergeCustomersErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The route, or the record it names, does not exist.
+     */
+    404: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type MergeCustomersError = MergeCustomersErrors[keyof MergeCustomersErrors];
+
+export type MergeCustomersResponses = {
+    200: {
+        data: CustomerDetailData;
+    };
+};
+
+export type MergeCustomersResponse = MergeCustomersResponses[keyof MergeCustomersResponses];
 
 export type SubmitTransactionData = {
     body: CreateTransactionData;
