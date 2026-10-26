@@ -132,7 +132,8 @@ to `fix:` when the regenerated code changes, so release-please ships it as its o
 - When Puntjes publishes a new API spec, `.github/workflows/regenerate.yml` opens a PR with the new code. A minor or
   patch spec merges itself when CI is green; a major one waits for a person. CI also compares the public API with the
   last release on npm (`tools/bc-check.ts`). A PR that removes or changes a public declaration fails until its title
-  is `feat!:` or `fix!:`, or its body has a `BREAKING CHANGE:` line.
+  is `feat!:` or `fix!:`, or its body has a `BREAKING CHANGE:` line. A new choice in a union of literals, such as a
+  new `locale`, is not a change: it ships in a minor release.
 - `.github/workflows/release.yml` runs release-please. Its release PR merges itself when CI is green, and the tag
   publishes the package to npm with provenance.
 
