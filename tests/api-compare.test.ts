@@ -35,6 +35,37 @@ describe('API compare', () => {
     expect(removedOrChanged(report(widget), report(changed))).toEqual(['export interface Widget changed. No longer there: id: number;']);
   });
 
+  it('passes a choice added to a union of literals', () => {
+    const before = "export type Customer = {\n    locale?: 'nl' | 'en' | null;\n};";
+    const after = "export type Customer = {\n    locale?: 'nl' | 'de' | 'en' | null;\n};";
+
+    expect(removedOrChanged(report(before), report(after))).toEqual([]);
+  });
+
+  it('passes a choice added to a union of literals in a report with CRLF line ends', () => {
+    const before = "export type Customer = {\n    locale?: 'nl' | 'en' | null;\n};";
+    const after = "export type Customer = {\n    locale?: 'nl' | 'de' | 'en' | null;\n};";
+    const crlf = (text: string) => text.replaceAll('\n', '\r\n');
+
+    expect(removedOrChanged(crlf(report(before)), crlf(report(after)))).toEqual([]);
+  });
+
+  it('reports a choice removed from a union of literals', () => {
+    const before = "export type Customer = {\n    status?: 'active' | 'inactive' | 'archived';\n};";
+    const after = "export type Customer = {\n    status?: 'active' | 'archived' | 'paused';\n};";
+
+    expect(removedOrChanged(report(before), report(after))).toEqual([
+      "export type Customer changed. No longer there: status?: 'active' | 'inactive' | 'archived';",
+    ]);
+  });
+
+  it('reports a union that moves to another field', () => {
+    const before = "export type Customer = {\n    locale?: 'nl' | 'en';\n};";
+    const after = "export type Customer = {\n    language?: 'nl' | 'en' | 'de';\n};";
+
+    expect(removedOrChanged(report(before), report(after))).toEqual(["export type Customer changed. No longer there: locale?: 'nl' | 'en';"]);
+  });
+
   it('reports a name that now means something else', () => {
     const before = 'export type Data = {\n    body?: never;\n    url: string;\n};';
     const after = 'export type Data = {\n    branch?: string | null;\n    url: string;\n};';
