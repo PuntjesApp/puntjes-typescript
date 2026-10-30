@@ -245,6 +245,16 @@ export type ChangeExternalIdData = {
 };
 
 /**
+ * ClientSecretData
+ */
+export type ClientSecretData = {
+    /**
+     * The current `client_secret` of this client, or the old one in its 60 minutes.
+     */
+    client_secret: string;
+};
+
+/**
  * CommerceStatisticsData
  */
 export type CommerceStatisticsData = {
@@ -280,6 +290,20 @@ export type CreateIdentifierData = {
     type: 'email' | 'loyalty_card';
     value: string;
     is_primary?: boolean;
+};
+
+/**
+ * CreatePartnerApiClientData
+ */
+export type CreatePartnerApiClientData = {
+    /**
+     * The `connection` handle the partner got on its redirect URI after the admin allowed.
+     */
+    connection: string;
+    /**
+     * The name of the new client, as the vendor sees it under API clients.
+     */
+    label: string;
 };
 
 /**
@@ -869,6 +893,20 @@ export type MomentCampaignConfigData = {
 };
 
 /**
+ * NewClientSecretData
+ */
+export type NewClientSecretData = {
+    /**
+     * The `client_id` for `POST /oauth/token`. It does not change.
+     */
+    client_id: string;
+    /**
+     * The new `client_secret` for `POST /oauth/token`.
+     */
+    client_secret: string;
+};
+
+/**
  * NthPurchaseCampaignConfigData
  */
 export type NthPurchaseCampaignConfigData = {
@@ -922,6 +960,28 @@ export type PaginationMeta = {
     last_page: number;
     per_page: number;
     total: number;
+};
+
+/**
+ * PartnerApiClientData
+ */
+export type PartnerApiClientData = {
+    /**
+     * The `client_id` for `POST /oauth/token`.
+     */
+    client_id: string;
+    /**
+     * The `client_secret` for `POST /oauth/token`.
+     */
+    client_secret: string;
+    /**
+     * The vendor that allowed the connection.
+     */
+    vendor: {
+        id: number;
+        name: string;
+    };
+    branch: BranchReferenceData | null;
 };
 
 /**
@@ -3282,6 +3342,152 @@ export type ListBranchesResponses = {
 };
 
 export type ListBranchesResponse = ListBranchesResponses[keyof ListBranchesResponses];
+
+export type CreatePartnerApiClientData2 = {
+    body: CreatePartnerApiClientData;
+    path?: never;
+    query?: never;
+    url: '/partner/clients';
+};
+
+export type CreatePartnerApiClientErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The route, or the record it names, does not exist.
+     */
+    404: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type CreatePartnerApiClientError = CreatePartnerApiClientErrors[keyof CreatePartnerApiClientErrors];
+
+export type CreatePartnerApiClientResponses = {
+    201: {
+        data: PartnerApiClientData;
+    };
+};
+
+export type CreatePartnerApiClientResponse = CreatePartnerApiClientResponses[keyof CreatePartnerApiClientResponses];
+
+export type RotateClientSecretData = {
+    body: ClientSecretData;
+    path?: never;
+    query?: never;
+    url: '/client/secret';
+};
+
+export type RotateClientSecretErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type RotateClientSecretError = RotateClientSecretErrors[keyof RotateClientSecretErrors];
+
+export type RotateClientSecretResponses = {
+    200: {
+        data: NewClientSecretData;
+    };
+};
+
+export type RotateClientSecretResponse = RotateClientSecretResponses[keyof RotateClientSecretResponses];
+
+export type DeleteClientData = {
+    body: ClientSecretData;
+    path?: never;
+    query?: never;
+    url: '/client';
+};
+
+export type DeleteClientErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type DeleteClientError = DeleteClientErrors[keyof DeleteClientErrors];
+
+export type DeleteClientResponses = {
+    204: void;
+};
+
+export type DeleteClientResponse = DeleteClientResponses[keyof DeleteClientResponses];
 
 export type CheckHealthData = {
     body?: never;
