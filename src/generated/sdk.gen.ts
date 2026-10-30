@@ -2,7 +2,7 @@
 
 import { client } from './client.gen.js';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index.js';
-import type { AdjustWalletData, AdjustWalletErrors, AdjustWalletResponses, BulkUpsertProductsData, BulkUpsertProductsErrors, BulkUpsertProductsResponses, ChangeCustomerExternalIdData, ChangeCustomerExternalIdErrors, ChangeCustomerExternalIdResponses, CheckHealthData, CheckHealthErrors, CheckHealthResponses, CreateProductData2, CreateProductErrors, CreateProductResponses, CreateRewardFromProductData2, CreateRewardFromProductErrors, CreateRewardFromProductResponses, DeleteProductData, DeleteProductErrors, DeleteProductResponses, DownloadWalletPassData, DownloadWalletPassErrors, DownloadWalletPassResponses, LinkCustomerExternalIdData, LinkCustomerExternalIdErrors, LinkCustomerExternalIdResponses, ListBranchesData, ListBranchesErrors, ListBranchesResponses, ListCampaignsData, ListCampaignsErrors, ListCampaignsResponses, ListCustomerRedemptionsData, ListCustomerRedemptionsErrors, ListCustomerRedemptionsResponses, ListCustomerTransactionsData, ListCustomerTransactionsErrors, ListCustomerTransactionsResponses, ListCustomerVouchersData, ListCustomerVouchersErrors, ListCustomerVouchersResponses, ListLedgerEntriesData, ListLedgerEntriesErrors, ListLedgerEntriesResponses, ListProductsData, ListProductsErrors, ListProductsResponses, ListRewardsData, ListRewardsErrors, ListRewardsResponses, LookupCustomerData, LookupCustomerErrors, LookupCustomerResponses, LookupRedemptionData, LookupRedemptionErrors, LookupRedemptionResponses, LookupVoucherData, LookupVoucherErrors, LookupVoucherResponses, MergeCustomersData, MergeCustomersErrors, MergeCustomersResponses, RedeemRewardData, RedeemRewardErrors, RedeemRewardResponses, RegisterCustomerData, RegisterCustomerErrors, RegisterCustomerResponses, ReplaceCustomerByExternalIdData, ReplaceCustomerByExternalIdErrors, ReplaceCustomerByExternalIdResponses, SendLoyaltyCardByExternalIdData, SendLoyaltyCardByExternalIdErrors, SendLoyaltyCardByExternalIdResponses, SendLoyaltyCardData, SendLoyaltyCardErrors, SendLoyaltyCardResponses, ShowCustomerData, ShowCustomerErrors, ShowCustomerResponses, ShowMeData, ShowMeErrors, ShowMeResponses, ShowProductData, ShowProductErrors, ShowProductResponses, ShowStatisticsData, ShowStatisticsErrors, ShowStatisticsResponses, ShowWalletData, ShowWalletErrors, ShowWalletResponses, SubmitTransactionData, SubmitTransactionErrors, SubmitTransactionResponses, UpdateCustomerByExternalIdData, UpdateCustomerByExternalIdErrors, UpdateCustomerByExternalIdResponses, UpdateProductData2, UpdateProductErrors, UpdateProductResponses, UpsertProductData2, UpsertProductErrors, UpsertProductResponses, VerifyRedemptionData2, VerifyRedemptionErrors, VerifyRedemptionResponses, VerifyVoucherData, VerifyVoucherErrors, VerifyVoucherResponses } from './types.gen.js';
+import type { AdjustWalletData, AdjustWalletErrors, AdjustWalletResponses, BulkUpsertProductsData, BulkUpsertProductsErrors, BulkUpsertProductsResponses, ChangeCustomerExternalIdData, ChangeCustomerExternalIdErrors, ChangeCustomerExternalIdResponses, CheckHealthData, CheckHealthErrors, CheckHealthResponses, CreatePartnerApiClientData2, CreatePartnerApiClientErrors, CreatePartnerApiClientResponses, CreateProductData2, CreateProductErrors, CreateProductResponses, CreateRewardFromProductData2, CreateRewardFromProductErrors, CreateRewardFromProductResponses, DeleteClientData, DeleteClientErrors, DeleteClientResponses, DeleteProductData, DeleteProductErrors, DeleteProductResponses, DownloadWalletPassData, DownloadWalletPassErrors, DownloadWalletPassResponses, LinkCustomerExternalIdData, LinkCustomerExternalIdErrors, LinkCustomerExternalIdResponses, ListBranchesData, ListBranchesErrors, ListBranchesResponses, ListCampaignsData, ListCampaignsErrors, ListCampaignsResponses, ListCustomerRedemptionsData, ListCustomerRedemptionsErrors, ListCustomerRedemptionsResponses, ListCustomerTransactionsData, ListCustomerTransactionsErrors, ListCustomerTransactionsResponses, ListCustomerVouchersData, ListCustomerVouchersErrors, ListCustomerVouchersResponses, ListLedgerEntriesData, ListLedgerEntriesErrors, ListLedgerEntriesResponses, ListProductsData, ListProductsErrors, ListProductsResponses, ListRewardsData, ListRewardsErrors, ListRewardsResponses, LookupCustomerData, LookupCustomerErrors, LookupCustomerResponses, LookupRedemptionData, LookupRedemptionErrors, LookupRedemptionResponses, LookupVoucherData, LookupVoucherErrors, LookupVoucherResponses, MergeCustomersData, MergeCustomersErrors, MergeCustomersResponses, RedeemRewardData, RedeemRewardErrors, RedeemRewardResponses, RegisterCustomerData, RegisterCustomerErrors, RegisterCustomerResponses, ReplaceCustomerByExternalIdData, ReplaceCustomerByExternalIdErrors, ReplaceCustomerByExternalIdResponses, RotateClientSecretData, RotateClientSecretErrors, RotateClientSecretResponses, SendLoyaltyCardByExternalIdData, SendLoyaltyCardByExternalIdErrors, SendLoyaltyCardByExternalIdResponses, SendLoyaltyCardData, SendLoyaltyCardErrors, SendLoyaltyCardResponses, ShowCustomerData, ShowCustomerErrors, ShowCustomerResponses, ShowMeData, ShowMeErrors, ShowMeResponses, ShowProductData, ShowProductErrors, ShowProductResponses, ShowStatisticsData, ShowStatisticsErrors, ShowStatisticsResponses, ShowWalletData, ShowWalletErrors, ShowWalletResponses, SubmitTransactionData, SubmitTransactionErrors, SubmitTransactionResponses, UpdateCustomerByExternalIdData, UpdateCustomerByExternalIdErrors, UpdateCustomerByExternalIdResponses, UpdateProductData2, UpdateProductErrors, UpdateProductResponses, UpsertProductData2, UpsertProductErrors, UpsertProductResponses, VerifyRedemptionData2, VerifyRedemptionErrors, VerifyRedemptionResponses, VerifyVoucherData, VerifyVoucherErrors, VerifyVoucherResponses } from './types.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -59,7 +59,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public lookupCustomer<ThrowOnError extends boolean = true>(options?: Options<LookupCustomerData, ThrowOnError>): RequestResult<LookupCustomerResponses, LookupCustomerErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<LookupCustomerResponses, LookupCustomerErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/lookup',
             ...options
         });
@@ -67,7 +71,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public registerCustomer<ThrowOnError extends boolean = true>(options?: Options<RegisterCustomerData, ThrowOnError>): RequestResult<RegisterCustomerResponses, RegisterCustomerErrors, ThrowOnError> {
         return (options?.client ?? this.client).post<RegisterCustomerResponses, RegisterCustomerErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers',
             ...options,
             headers: {
@@ -79,7 +87,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public updateCustomerByExternalId<ThrowOnError extends boolean = true>(options: Options<UpdateCustomerByExternalIdData, ThrowOnError>): RequestResult<UpdateCustomerByExternalIdResponses, UpdateCustomerByExternalIdErrors, ThrowOnError> {
         return (options.client ?? this.client).patch<UpdateCustomerByExternalIdResponses, UpdateCustomerByExternalIdErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/by-external-id/{externalId}',
             ...options,
             headers: {
@@ -91,7 +103,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public replaceCustomerByExternalId<ThrowOnError extends boolean = true>(options: Options<ReplaceCustomerByExternalIdData, ThrowOnError>): RequestResult<ReplaceCustomerByExternalIdResponses, ReplaceCustomerByExternalIdErrors, ThrowOnError> {
         return (options.client ?? this.client).put<ReplaceCustomerByExternalIdResponses, ReplaceCustomerByExternalIdErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/by-external-id/{externalId}',
             ...options,
             headers: {
@@ -103,7 +119,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public linkCustomerExternalId<ThrowOnError extends boolean = true>(options: Options<LinkCustomerExternalIdData, ThrowOnError>): RequestResult<LinkCustomerExternalIdResponses, LinkCustomerExternalIdErrors, ThrowOnError> {
         return (options.client ?? this.client).post<LinkCustomerExternalIdResponses, LinkCustomerExternalIdErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/link-external-id',
             ...options,
             headers: {
@@ -115,7 +135,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public changeCustomerExternalId<ThrowOnError extends boolean = true>(options: Options<ChangeCustomerExternalIdData, ThrowOnError>): RequestResult<ChangeCustomerExternalIdResponses, ChangeCustomerExternalIdErrors, ThrowOnError> {
         return (options.client ?? this.client).put<ChangeCustomerExternalIdResponses, ChangeCustomerExternalIdErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/external-id',
             ...options,
             headers: {
@@ -127,7 +151,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public sendLoyaltyCardByExternalId<ThrowOnError extends boolean = true>(options: Options<SendLoyaltyCardByExternalIdData, ThrowOnError>): RequestResult<SendLoyaltyCardByExternalIdResponses, SendLoyaltyCardByExternalIdErrors, ThrowOnError> {
         return (options.client ?? this.client).post<SendLoyaltyCardByExternalIdResponses, SendLoyaltyCardByExternalIdErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/by-external-id/{externalId}/send-card',
             ...options,
             headers: {
@@ -139,7 +167,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public sendLoyaltyCard<ThrowOnError extends boolean = true>(options: Options<SendLoyaltyCardData, ThrowOnError>): RequestResult<SendLoyaltyCardResponses, SendLoyaltyCardErrors, ThrowOnError> {
         return (options.client ?? this.client).post<SendLoyaltyCardResponses, SendLoyaltyCardErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/send-card',
             ...options,
             headers: {
@@ -151,7 +183,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public showCustomer<ThrowOnError extends boolean = true>(options: Options<ShowCustomerData, ThrowOnError>): RequestResult<ShowCustomerResponses, ShowCustomerErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ShowCustomerResponses, ShowCustomerErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}',
             ...options
         });
@@ -159,7 +195,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public mergeCustomers<ThrowOnError extends boolean = true>(options: Options<MergeCustomersData, ThrowOnError>): RequestResult<MergeCustomersResponses, MergeCustomersErrors, ThrowOnError> {
         return (options.client ?? this.client).post<MergeCustomersResponses, MergeCustomersErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/merge',
             ...options,
             headers: {
@@ -171,7 +211,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public submitTransaction<ThrowOnError extends boolean = true>(options: Options<SubmitTransactionData, ThrowOnError>): RequestResult<SubmitTransactionResponses, SubmitTransactionErrors, ThrowOnError> {
         return (options.client ?? this.client).post<SubmitTransactionResponses, SubmitTransactionErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/transactions',
             ...options,
             headers: {
@@ -183,7 +227,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listCustomerTransactions<ThrowOnError extends boolean = true>(options: Options<ListCustomerTransactionsData, ThrowOnError>): RequestResult<ListCustomerTransactionsResponses, ListCustomerTransactionsErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ListCustomerTransactionsResponses, ListCustomerTransactionsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/transactions',
             ...options
         });
@@ -191,7 +239,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public showWallet<ThrowOnError extends boolean = true>(options: Options<ShowWalletData, ThrowOnError>): RequestResult<ShowWalletResponses, ShowWalletErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ShowWalletResponses, ShowWalletErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/wallet',
             ...options
         });
@@ -199,7 +251,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listLedgerEntries<ThrowOnError extends boolean = true>(options: Options<ListLedgerEntriesData, ThrowOnError>): RequestResult<ListLedgerEntriesResponses, ListLedgerEntriesErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ListLedgerEntriesResponses, ListLedgerEntriesErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/ledger',
             ...options
         });
@@ -207,7 +263,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public downloadWalletPass<ThrowOnError extends boolean = true>(options: Options<DownloadWalletPassData, ThrowOnError>): RequestResult<DownloadWalletPassResponses, DownloadWalletPassErrors, ThrowOnError> {
         return (options.client ?? this.client).get<DownloadWalletPassResponses, DownloadWalletPassErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/wallet-pass',
             ...options
         });
@@ -215,7 +275,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public adjustWallet<ThrowOnError extends boolean = true>(options: Options<AdjustWalletData, ThrowOnError>): RequestResult<AdjustWalletResponses, AdjustWalletErrors, ThrowOnError> {
         return (options.client ?? this.client).post<AdjustWalletResponses, AdjustWalletErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/wallet/adjust',
             ...options,
             headers: {
@@ -227,7 +291,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listRewards<ThrowOnError extends boolean = true>(options?: Options<ListRewardsData, ThrowOnError>): RequestResult<ListRewardsResponses, ListRewardsErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<ListRewardsResponses, ListRewardsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/rewards',
             ...options
         });
@@ -235,7 +303,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listCustomerRedemptions<ThrowOnError extends boolean = true>(options: Options<ListCustomerRedemptionsData, ThrowOnError>): RequestResult<ListCustomerRedemptionsResponses, ListCustomerRedemptionsErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ListCustomerRedemptionsResponses, ListCustomerRedemptionsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/redemptions',
             ...options
         });
@@ -243,7 +315,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public redeemReward<ThrowOnError extends boolean = true>(options: Options<RedeemRewardData, ThrowOnError>): RequestResult<RedeemRewardResponses, RedeemRewardErrors, ThrowOnError> {
         return (options.client ?? this.client).post<RedeemRewardResponses, RedeemRewardErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/redemptions',
             ...options,
             headers: {
@@ -255,7 +331,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public lookupRedemption<ThrowOnError extends boolean = true>(options: Options<LookupRedemptionData, ThrowOnError>): RequestResult<LookupRedemptionResponses, LookupRedemptionErrors, ThrowOnError> {
         return (options.client ?? this.client).get<LookupRedemptionResponses, LookupRedemptionErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/redemptions/{code}',
             ...options
         });
@@ -263,7 +343,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public verifyRedemption<ThrowOnError extends boolean = true>(options: Options<VerifyRedemptionData2, ThrowOnError>): RequestResult<VerifyRedemptionResponses, VerifyRedemptionErrors, ThrowOnError> {
         return (options.client ?? this.client).post<VerifyRedemptionResponses, VerifyRedemptionErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/redemptions/{code}/verify',
             ...options,
             headers: {
@@ -275,7 +359,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listProducts<ThrowOnError extends boolean = true>(options?: Options<ListProductsData, ThrowOnError>): RequestResult<ListProductsResponses, ListProductsErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<ListProductsResponses, ListProductsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products',
             ...options
         });
@@ -283,7 +371,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public createProduct<ThrowOnError extends boolean = true>(options: Options<CreateProductData2, ThrowOnError>): RequestResult<CreateProductResponses, CreateProductErrors, ThrowOnError> {
         return (options.client ?? this.client).post<CreateProductResponses, CreateProductErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products',
             ...options,
             headers: {
@@ -295,7 +387,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public bulkUpsertProducts<ThrowOnError extends boolean = true>(options: Options<BulkUpsertProductsData, ThrowOnError>): RequestResult<BulkUpsertProductsResponses, BulkUpsertProductsErrors, ThrowOnError> {
         return (options.client ?? this.client).post<BulkUpsertProductsResponses, BulkUpsertProductsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products/batch',
             ...options,
             headers: {
@@ -307,7 +403,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public createRewardFromProduct<ThrowOnError extends boolean = true>(options: Options<CreateRewardFromProductData2, ThrowOnError>): RequestResult<CreateRewardFromProductResponses, CreateRewardFromProductErrors, ThrowOnError> {
         return (options.client ?? this.client).post<CreateRewardFromProductResponses, CreateRewardFromProductErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products/{externalId}/reward',
             ...options,
             headers: {
@@ -319,7 +419,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public deleteProduct<ThrowOnError extends boolean = true>(options: Options<DeleteProductData, ThrowOnError>): RequestResult<DeleteProductResponses, DeleteProductErrors, ThrowOnError> {
         return (options.client ?? this.client).delete<DeleteProductResponses, DeleteProductErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products/{externalId}',
             ...options
         });
@@ -327,7 +431,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public showProduct<ThrowOnError extends boolean = true>(options: Options<ShowProductData, ThrowOnError>): RequestResult<ShowProductResponses, ShowProductErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ShowProductResponses, ShowProductErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products/{externalId}',
             ...options
         });
@@ -335,7 +443,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public updateProduct<ThrowOnError extends boolean = true>(options: Options<UpdateProductData2, ThrowOnError>): RequestResult<UpdateProductResponses, UpdateProductErrors, ThrowOnError> {
         return (options.client ?? this.client).patch<UpdateProductResponses, UpdateProductErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products/{externalId}',
             ...options,
             headers: {
@@ -347,7 +459,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public upsertProduct<ThrowOnError extends boolean = true>(options: Options<UpsertProductData2, ThrowOnError>): RequestResult<UpsertProductResponses, UpsertProductErrors, ThrowOnError> {
         return (options.client ?? this.client).put<UpsertProductResponses, UpsertProductErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/products/{externalId}',
             ...options,
             headers: {
@@ -359,7 +475,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listCampaigns<ThrowOnError extends boolean = true>(options?: Options<ListCampaignsData, ThrowOnError>): RequestResult<ListCampaignsResponses, ListCampaignsErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<ListCampaignsResponses, ListCampaignsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/campaigns',
             ...options
         });
@@ -367,7 +487,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public listCustomerVouchers<ThrowOnError extends boolean = true>(options: Options<ListCustomerVouchersData, ThrowOnError>): RequestResult<ListCustomerVouchersResponses, ListCustomerVouchersErrors, ThrowOnError> {
         return (options.client ?? this.client).get<ListCustomerVouchersResponses, ListCustomerVouchersErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/customers/{customer}/vouchers',
             ...options
         });
@@ -375,7 +499,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public lookupVoucher<ThrowOnError extends boolean = true>(options: Options<LookupVoucherData, ThrowOnError>): RequestResult<LookupVoucherResponses, LookupVoucherErrors, ThrowOnError> {
         return (options.client ?? this.client).get<LookupVoucherResponses, LookupVoucherErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/vouchers/{code}',
             ...options
         });
@@ -383,7 +511,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public verifyVoucher<ThrowOnError extends boolean = true>(options: Options<VerifyVoucherData, ThrowOnError>): RequestResult<VerifyVoucherResponses, VerifyVoucherErrors, ThrowOnError> {
         return (options.client ?? this.client).post<VerifyVoucherResponses, VerifyVoucherErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/vouchers/{code}/verify',
             ...options,
             headers: {
@@ -395,7 +527,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public showStatistics<ThrowOnError extends boolean = true>(options?: Options<ShowStatisticsData, ThrowOnError>): RequestResult<ShowStatisticsResponses, ShowStatisticsErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<ShowStatisticsResponses, ShowStatisticsErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/statistics',
             ...options
         });
@@ -403,7 +539,11 @@ export class PuntjesApi extends HeyApiClient {
     
     public showMe<ThrowOnError extends boolean = true>(options?: Options<ShowMeData, ThrowOnError>): RequestResult<ShowMeResponses, ShowMeErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<ShowMeResponses, ShowMeErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/me',
             ...options
         });
@@ -411,9 +551,61 @@ export class PuntjesApi extends HeyApiClient {
     
     public listBranches<ThrowOnError extends boolean = true>(options?: Options<ListBranchesData, ThrowOnError>): RequestResult<ListBranchesResponses, ListBranchesErrors, ThrowOnError> {
         return (options?.client ?? this.client).get<ListBranchesResponses, ListBranchesErrors, ThrowOnError>({
-            security: [{ scheme: 'bearer', type: 'http' }],
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
             url: '/branches',
             ...options
+        });
+    }
+    
+    public createPartnerApiClient<ThrowOnError extends boolean = true>(options: Options<CreatePartnerApiClientData2, ThrowOnError>): RequestResult<CreatePartnerApiClientResponses, CreatePartnerApiClientErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<CreatePartnerApiClientResponses, CreatePartnerApiClientErrors, ThrowOnError>({
+            security: [{
+                    key: 'partnerAuthorizationCode',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
+            url: '/partner/clients',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    public rotateClientSecret<ThrowOnError extends boolean = true>(options: Options<RotateClientSecretData, ThrowOnError>): RequestResult<RotateClientSecretResponses, RotateClientSecretErrors, ThrowOnError> {
+        return (options.client ?? this.client).post<RotateClientSecretResponses, RotateClientSecretErrors, ThrowOnError>({
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
+            url: '/client/secret',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    public deleteClient<ThrowOnError extends boolean = true>(options: Options<DeleteClientData, ThrowOnError>): RequestResult<DeleteClientResponses, DeleteClientErrors, ThrowOnError> {
+        return (options.client ?? this.client).delete<DeleteClientResponses, DeleteClientErrors, ThrowOnError>({
+            security: [{
+                    key: 'oauth2',
+                    scheme: 'bearer',
+                    type: 'http'
+                }],
+            url: '/client',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
         });
     }
     
