@@ -5,6 +5,20 @@ export type ClientOptions = {
 };
 
 /**
+ * AddLoyaltyCardData
+ */
+export type AddLoyaltyCardData = {
+    /**
+     * The code of a card without a customer on your card list. The setting for new codes does not apply.
+     */
+    code: string;
+    /**
+     * The code of the card the customer gives back. Only an active card of this customer is switched off.
+     */
+    replaces?: string | null;
+};
+
+/**
  * AdjustWalletApiData
  */
 export type AdjustWalletApiData = {
@@ -1989,6 +2003,122 @@ export type SendLoyaltyCardResponses = {
 };
 
 export type SendLoyaltyCardResponse = SendLoyaltyCardResponses[keyof SendLoyaltyCardResponses];
+
+export type AddLoyaltyCardByExternalIdData = {
+    body: AddLoyaltyCardData;
+    path: {
+        externalId: string | null;
+    };
+    query?: never;
+    url: '/customers/by-external-id/{externalId}/loyalty-cards';
+};
+
+export type AddLoyaltyCardByExternalIdErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The route, or the record it names, does not exist.
+     */
+    404: ErrorResponse;
+    /**
+     * The request conflicts with something that already exists.
+     */
+    409: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type AddLoyaltyCardByExternalIdError = AddLoyaltyCardByExternalIdErrors[keyof AddLoyaltyCardByExternalIdErrors];
+
+export type AddLoyaltyCardByExternalIdResponses = {
+    200: {
+        data: CustomerDetailData;
+    };
+};
+
+export type AddLoyaltyCardByExternalIdResponse = AddLoyaltyCardByExternalIdResponses[keyof AddLoyaltyCardByExternalIdResponses];
+
+export type AddLoyaltyCardData2 = {
+    body: AddLoyaltyCardData;
+    path: {
+        customer: string | null;
+    };
+    query?: never;
+    url: '/customers/{customer}/loyalty-cards';
+};
+
+export type AddLoyaltyCardErrors = {
+    /**
+     * The request is missing something the API needs before it can act.
+     */
+    400: ErrorResponse;
+    /**
+     * The credential is missing, malformed, or not accepted.
+     */
+    401: ErrorResponse;
+    /**
+     * The credential is valid, but this vendor may not do this right now.
+     */
+    403: ErrorResponse;
+    /**
+     * The route, or the record it names, does not exist.
+     */
+    404: ErrorResponse;
+    /**
+     * The request conflicts with something that already exists.
+     */
+    409: ErrorResponse;
+    /**
+     * The body is in a format the API cannot read. Send it as JSON, or as a form.
+     */
+    415: ErrorResponse;
+    /**
+     * The request was understood, and the API refuses to act on it.
+     */
+    422: ErrorResponse;
+    /**
+     * Too many requests. `x-error-codes` names the limit; not every one of them clears by waiting.
+     */
+    429: ErrorResponse;
+    /**
+     * Something went wrong on our side. Quote the request_id when you report it.
+     */
+    500: ErrorResponse;
+};
+
+export type AddLoyaltyCardError = AddLoyaltyCardErrors[keyof AddLoyaltyCardErrors];
+
+export type AddLoyaltyCardResponses = {
+    200: {
+        data: CustomerDetailData;
+    };
+};
+
+export type AddLoyaltyCardResponse = AddLoyaltyCardResponses[keyof AddLoyaltyCardResponses];
 
 export type ShowCustomerData = {
     body?: never;
