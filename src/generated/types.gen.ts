@@ -368,7 +368,7 @@ export type CreateRewardFromProductData = {
  * CreateTransactionData
  */
 export type CreateTransactionData = {
-    identifier: string;
+    identifier?: string | null;
     idempotency_key: string;
     total_amount: number;
     description?: string | null;
@@ -1344,7 +1344,7 @@ export type TransactionCampaignConfigData = {
  */
 export type TransactionData = {
     id: number;
-    customer_id: number;
+    customer_id: number | null;
     idempotency_key: string;
     total_amount: number;
     description: string | null;
