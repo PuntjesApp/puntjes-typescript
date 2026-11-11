@@ -29,6 +29,7 @@ function main(oldEntry: string, newEntry: string, title: string, body: string): 
   console.error(
     '\nThis PR breaks the public API of the last release, and its title is not marked as breaking.' +
       '\nRetitle it with `feat!:` (or `fix!:`), or add a `BREAKING CHANGE:` line to the body. CI runs again at once.' +
+      '\nIf auto-merge is on, turn it off and on again after the retitle: the squash commit keeps the title it had when auto-merge was enabled.' +
       '\nThe release is then a major version.',
   );
   return 1;
