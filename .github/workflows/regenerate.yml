@@ -131,7 +131,7 @@ jobs:
           npm run build
           tools/unpack-last-release.sh "$RUNNER_TEMP/last-release"
           status=0
-          PR_TITLE= PR_BODY= node tools/bc-check.ts "$RUNNER_TEMP/last-release/dist/index.d.ts" dist/index.d.ts || status=$?
+          env PR_TITLE='' PR_BODY='' node tools/bc-check.ts "$RUNNER_TEMP/last-release/dist/index.d.ts" dist/index.d.ts || status=$?
           case "$status" in
             0) echo "breaking=false" >> "$GITHUB_OUTPUT" ;;
             1) echo "::notice::The regenerated client breaks the last release, so the PR is feat!: and waits for a person."
