@@ -63,5 +63,13 @@ function report(entry: string): string {
   return readFileSync(config.reportFilePath, 'utf8');
 }
 
+// Exit 0: no break, or a marked one. Exit 1: an unmarked break. Exit 2: the check itself failed, which says nothing
+// about a break (the regenerate workflow relies on this split).
 const [oldEntry = '', newEntry = ''] = process.argv.slice(2);
-process.exitCode = main(oldEntry, newEntry, process.env.PR_TITLE ?? '', process.env.PR_BODY ?? '');
+
+try {
+  process.exitCode = main(oldEntry, newEntry, process.env.PR_TITLE ?? '', process.env.PR_BODY ?? '');
+} catch (error) {
+  console.error(error);
+  process.exitCode = 2;
+}
